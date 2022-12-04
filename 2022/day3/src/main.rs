@@ -33,7 +33,6 @@ fn first_part(file: String)  -> u32{
 }
 
 fn second_part(file: String) -> u32 {
-
     file
     .lines()
     .array_chunks::<3>()
