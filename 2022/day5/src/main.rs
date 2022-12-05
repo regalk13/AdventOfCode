@@ -22,7 +22,6 @@ fn permut(mut hash: HashMap<u32, Vec<char>>, mut moves: Vec<u32>) -> HashMap<u32
 
         hash.get_mut(&moves[1]).expect("expected a item lol").drain(0..moves[0] as usize);
 
-        println!("{:?}", hash);
         moves.remove(0);
         moves.remove(0);
         moves.remove(0);
