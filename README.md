@@ -1,3 +1,3 @@
-# AdventOfCode
+# Advent Of Code
 
-Learning to solve in rust :0
+🎄 | Advent Of Code on rust 
