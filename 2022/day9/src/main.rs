@@ -54,6 +54,77 @@ fn move_it(hx: i32, hy: i32, tx: i32, ty: i32) -> (i32, i32) {
     (temp_tx, temp_ty)
 }
 
+fn move_second(dx: i32, dy: i32, mut knots: Vec<(i32, i32)>) -> Vec<(i32, i32)> {
+    let mut sign_x = 0;
+    let mut sign_y = 0;
+    knots[0].0 += dx;
+    knots[0].1 += dy;
+
+    for i in 1..10 {
+        let tuple = knots[i - 1];
+        let hx =  tuple.0;
+        let hy = tuple.1;
+        let tuple_t = knots[i];
+        let mut tx = tuple_t.0;
+        let mut ty = tuple_t.1;
+
+        if !(touching(hx, hy, tx, ty)) {
+            if hx == tx {
+                sign_x = 0;
+            }
+            else {
+                sign_x = (hx - tx) / (hx - tx).abs();
+            }
+
+            if hy == ty {
+                sign_y = 0;
+            }
+            else {
+                sign_y = (hy - ty) / (hy - ty).abs();
+            }
+            
+            tx += sign_x;
+            ty += sign_y;
+        }
+        knots[i] = (tx, ty);
+    };
+
+    knots
+
+}
+
+fn second_part(file: String) -> u32 {
+    let moves = file.trim().split("\n").collect::<Vec<&str>>();
+    
+    let mut knots = (0..10).map(|c| (c,c)).collect::<Vec<_>>();
+    
+    let mut tail_visited = HashSet::new();
+    tail_visited.insert(knots[knots.len() - 1]);
+    
+    for line in moves {
+        let (op, amount) = line.split_once(" ").unwrap();
+
+        let range_amount = amount.parse::<i32>().unwrap();
+        let ds = op.parse::<Moves>().unwrap();
+         
+        let ds_moves = match ds {
+            Moves::Up => [0, 1],
+            Moves::Down => [0, -1],
+            Moves::Left => [-1, 0],
+            Moves::Right => [1, 0]
+        };
+        
+        for _ in 1..range_amount {
+            let dx = ds_moves[0];
+            let dy = ds_moves[1];
+            knots = move_second(dx, dy, knots);
+            tail_visited.insert(knots[knots.len() - 1]);
+        }
+
+    };
+    tail_visited.len() as u32
+
+}
 fn first_part(file: String) -> u32 {
     let moves = file.trim().split("\n").collect::<Vec<&str>>();
     
@@ -90,7 +161,7 @@ fn first_part(file: String) -> u32 {
 }
 
 fn main() {
-    let file = std::fs::read_to_string("./input").expect("Couldn't read input file");
+    let file = std::fs::read_to_string("./input.test").expect("Couldn't read input file");
    
-   println!("Result: {:?}", first_part(file));
+   println!("Result: {:?}", second_part(file));
 }
