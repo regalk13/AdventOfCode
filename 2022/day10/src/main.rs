@@ -215,7 +215,6 @@ fn first_part(file: String) -> i32 {
             }
             cpu.add_cycle(value.parse::<i32>().unwrap()); 
         }
-        
     };
 
     println!("Cpu X: {}, cpu cycles: {}", cpu.x, cpu.cycle);
@@ -223,7 +222,7 @@ fn first_part(file: String) -> i32 {
 }
 
 fn main() {
-    let file = std::fs::read_to_string("./input").expect("Couldn't read input file");
-    // println!("Sum: {}", first_part(file));
-    println!("{}", second_part(&file));
+    let file = std::fs::read_to_string("./input-2.test").expect("Couldn't read input file");
+    println!("Sum: {}", first_part(file));
+    // println!("{}", second_part(&file));
 }
