@@ -5,15 +5,18 @@ enum Operation {
 }
 
 impl Operation {
-    fn make_operation(&self, old: i32, op: i32) -> i32 {
+    fn make_operation(&self, old: u64, op: u64) -> u64 {
         match self {
             Operation::Sum => old + op,
-            Operation::Multiply => old * op 
+            Operation::Multiply => old * op
         }
     }
 
-    fn make_operation_part2(&self, old: u64, op: u64) -> i32 {
-      todo!() 
+    fn make_operation_part2(&self, old: u64, op: u64, magic_trick: u64) -> u64 {
+         match self {
+            Operation::Sum => (old + op)%magic_trick,
+            Operation::Multiply => (old * op)%magic_trick
+        }
     }
 }
 
@@ -80,6 +83,10 @@ fn parser(monkeys: Vec<&str>) -> Vec<Monkey> {
 fn part_2(file: &str) { 
     let monkeys = file.trim().split("\n\n").collect::<Vec<&str>>();
     let mut monkey_list = parser(monkeys);
+    let magic_trick = monkey_list
+        .iter()
+        .map(|monkey| monkey.test)
+        .product::<u64>();
     for i in 0..10_000 {
         println!("After round {}, the monkeys are holding items with these worry levels:", i);
         for (l, m) in monkey_list.clone().iter().enumerate() {
@@ -87,10 +94,10 @@ fn part_2(file: &str) {
             for (j, item) in monkey_listed[l].items.iter().enumerate() {
                 let mut new = 0;
                 if m.old == 0 {
-                    new = m.operation.make_operation(*item, *item) / 3;
+                    new = m.operation.make_operation_part2(*item, *item, magic_trick);
                 }
                 else {
-                    new = m.operation.make_operation(*item, m.old) / 3;
+                    new = m.operation.make_operation_part2(*item, m.old, magic_trick);
                 }
                 // println!("Operation: {:?}, new: {}, old: {}", m.operation, new, m.old);
                 if new % m.test == 0 {
@@ -109,7 +116,7 @@ fn part_2(file: &str) {
            println!("Monkey: {}: {:?}", m.id, m.items);
         }
     }
-    let mut inspected = monkey_list.iter().map(|m| m.inspected).collect::<Vec<i32>>();
+    let mut inspected = monkey_list.iter().map(|m| m.inspected).collect::<Vec<u64>>();
     inspected.sort();
     println!("Inspected: {:?}", inspected[inspected.len() - 1] * inspected[inspected.len() - 2]);
 }
@@ -147,7 +154,7 @@ fn part_1(file: &str) {
            println!("Monkey: {}: {:?}", m.id, m.items);
         }
     }
-    let mut inspected = monkey_list.iter().map(|m| m.inspected).collect::<Vec<i32>>();
+    let mut inspected = monkey_list.iter().map(|m| m.inspected).collect::<Vec<u64>>();
     inspected.sort();
     println!("Inspected: {:?}", inspected[inspected.len() - 1] * inspected[inspected.len() - 2]);
 }
