@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::str::Chars;
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Clone)]
 enum Val {
     Number(i32),
     List(Vec<Val>),
@@ -90,23 +90,60 @@ impl Val {
             }
         }
          _ => panic!("Invalid input")        
+        }
     }
 }
+
+impl PartialOrd for Val {
+
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.compare(other))
+    }
 }
 
+impl Ord for Val {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.partial_cmp(other).unwrap()
+    }
+}
+
+fn second_part(file: &str)  {
+    let signals = file.split("\n").filter(|f| *f != "").collect::<Vec<&str>>();
+    
+    let mut output = 1;
+    let mut pairs: Vec<Val> = vec![];
+    
+    for pair in signals {
+        pairs.push(Val::parse(pair));
+    }
+    let d2 = Val::parse("[[2]]");
+    let d6 = Val::parse("[[6]]");
+
+    let mut list = vec![d2.clone(), d6.clone()];
+    list.extend(pairs.iter().cloned());
+
+    list.sort();
+    
+    for (index, value) in list.iter().enumerate() {
+        if *value == d2 || *value == d6 {
+            output *= index + 1;
+        }
+    }
+    println!("Output 2: {:?}", output);
+}
 
 fn first_part(file: &str) {
     let signals = file.split("\n").filter(|f| *f != "").collect::<Vec<&str>>();
+    
     let mut output = 0;
-    let mut pairs: Vec<(Val, Val)> = vec![];
-    for pair in signals.chunks(2) {
-        let left = Val::parse(&pair[0]);
-        let right = Val::parse(&pair[1]);
-        pairs.push((left,right));
+    let mut pairs: Vec<Val> = vec![];
+    
+    for pair in signals {
+        pairs.push(Val::parse(pair));
     }
 
-    for (i, p) in pairs.iter().enumerate() {
-        if p.0.compare(&p.1) == Ordering::Less {
+    for (i, p) in pairs.chunks(2).enumerate() {
+        if p[0] < p[1] {
             output += i + 1;
         }
     }
@@ -119,4 +156,5 @@ fn main() {
     
 
     first_part(&file);
+    second_part(&file);
 }
