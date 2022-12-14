@@ -62,18 +62,6 @@ impl Cave {
         }
         None
     }
-
-    fn display(&self) {
-        for y in 0..=9 {
-            for x in 495..=503 {
-                print!("{}", 
-                       if x == 500 && y == 0 { '+' }
-                       else if let Some(ch) = self.location.get(&(x,y)){ *ch } else { '.' });
-            }
-            println!("");
-        }
-    }
-
 }
 
 fn first_part(file: &str) {
@@ -88,13 +76,10 @@ fn first_part(file: &str) {
         }
     }
    
-    // cave.display();
     let mut output = 0;
     while cave.drop_sand() {
         output += 1;
     }
-    
-    // cave.display();
 
     println!("Output: {}", output);
    
@@ -112,13 +97,10 @@ fn second_part(file: &str) {
         }
     }
    
-    // cave.display();
     let mut output = 0;
     while cave.drop_sand() {
         output += 1;
     }
-    
-    // cave.display();
 
     println!("Output 2: {}", output);
  
