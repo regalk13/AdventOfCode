@@ -4,6 +4,7 @@ use std::collections::HashMap;
 struct Cave {
     location: HashMap<(i32, i32), char>,
     bottom: i32,
+    floor: bool,
 }
 
 impl Cave {
@@ -34,11 +35,18 @@ impl Cave {
     fn drop_sand(&mut self) -> bool {
         let mut sand: (i32, i32) = (500, 0);
         
+        if self.floor && self.location.contains_key(&sand) {
+            return false;
+        }
+
         while let Some(next_pos) = self.fall(sand) {
-            if next_pos.1 > self.bottom {
+            if !self.floor && next_pos.1 > self.bottom {
                 return false;
             }
             sand = next_pos;
+            if self.floor && sand.1 == self.bottom + 1 {
+                break;
+            }
         }
 
         self.location.insert(sand, 'o');
@@ -80,13 +88,13 @@ fn first_part(file: &str) {
         }
     }
    
-    cave.display();
+    // cave.display();
     let mut output = 0;
     while cave.drop_sand() {
         output += 1;
     }
     
-    cave.display();
+    // cave.display();
 
     println!("Output: {}", output);
    
@@ -94,7 +102,7 @@ fn first_part(file: &str) {
 
 fn second_part(file: &str) {
     let mut cave = Cave::default();
-    
+    cave.floor = true; 
     for line in file.trim().split("\n").collect::<Vec<&str>>() {
         let mut iter = line.split(" -> ");
         let mut start = Cave::convert(iter.next()).unwrap();
@@ -104,19 +112,19 @@ fn second_part(file: &str) {
         }
     }
    
-    cave.display();
+    // cave.display();
     let mut output = 0;
     while cave.drop_sand() {
         output += 1;
     }
     
-    cave.display();
+    // cave.display();
 
-    println!("Output: {}", output);
+    println!("Output 2: {}", output);
  
 }
 fn main() {
     let file = std::fs::read_to_string("./input").expect("Couldn't read input file");
-    // first_part(&file);  
+    first_part(&file);  
     second_part(&file); 
 }
