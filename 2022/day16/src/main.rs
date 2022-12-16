@@ -14,12 +14,6 @@ use nom::{
 };
 use pathfinding::prelude::{astar, dijkstra_all};
 
-pub fn solution(input: &str) -> String {
-    let valves = parse(input);
-    let compressed = compress(&valves);
-    let (ids, start) = identifiers(&compressed);
-    format!("{}, {}", part_one(&ids, start), part_two(&ids, start))
-}
 
 #[derive(Debug)]
 struct Valve<'a> {
