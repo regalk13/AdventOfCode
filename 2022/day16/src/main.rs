@@ -14,19 +14,41 @@ use nom::{
 };
 use pathfinding::prelude::{astar, dijkstra_all};
 
-
+// Valve Struct
 #[derive(Debug)]
 struct Valve<'a> {
     name: &'a str,
     flow: i64,
+    // Exit valves
     exit: Vec<&'a str>,
 }
 
+// Functions to parse the input in vector of valve structs!
+fn p_valves(input: &str) -> IResult<&str, Vec<Valve>> {
+    separated_list1(line_ending, p_valve)(input)
+}
+
+fn p_valve(input: &str) -> IResult<&str, Valve> {
+    let (input, name) = preceded(tag("Valve "), take(2usize))(input)?;
+    let (input, flow) = preceded(tag(" has flow rate="), i64)(input)?;
+    let (input, exit) = preceded(
+        alt((
+            tag("; tunnels lead to valves "),
+            tag("; tunnel leads to valve "),
+        )),
+        separated_list1(tag(", "), take(2usize)),
+    )(input)?;
+
+    Ok((input, Valve { name, flow, exit }))
+}
+// Parsing function, return a vec of valves from the input
 fn parse(input: &str) -> Vec<Valve> {
+    // parsing using function p_valves and the input
     let (_, valves) = all_consuming(p_valves)(input).expect("valid complete parse");
     valves
 }
 
+// Compressing your valve!
 #[derive(Debug)]
 struct CompressedValve<'a> {
     name: &'a str,
@@ -34,10 +56,12 @@ struct CompressedValve<'a> {
     exit: Vec<(&'a str, i64)>,
 }
 
+// Cache of our hashmap
 struct IdCache<T> {
     cache: HashMap<T, usize>,
 }
 
+// Implementing the caching
 impl<T: PartialEq + Eq + Hash> IdCache<T> {
     fn new() -> Self {
         Self {
@@ -57,6 +81,7 @@ impl<T: PartialEq + Eq + Hash> IdCache<T> {
     }
 }
 
+// Compressing a hasmap, using dijkstra algorithm for the mapping
 fn compress<'a>(valves: &'a [Valve]) -> HashMap<&'a str, CompressedValve<'a>> {
     let valves: HashMap<&str, &Valve> = valves.iter().map(|v| (v.name, v)).collect();
     let mut compressed = HashMap::new();
@@ -89,14 +114,17 @@ fn compress<'a>(valves: &'a [Valve]) -> HashMap<&'a str, CompressedValve<'a>> {
     compressed
 }
 
+// Start point
 const START: &str = "AA";
 
+// Id values 
 struct IdValve {
     name: usize,
     flow: i64,
     exit: Vec<(usize, i64)>,
 }
 
+// Creating the identifiers
 fn identifiers(valves: &HashMap<&str, CompressedValve>) -> (HashMap<usize, IdValve>, usize) {
     let mut cache = IdCache::new();
 
@@ -123,24 +151,7 @@ fn identifiers(valves: &HashMap<&str, CompressedValve>) -> (HashMap<usize, IdVal
     (id_valves, start)
 }
 
-fn p_valves(input: &str) -> IResult<&str, Vec<Valve>> {
-    separated_list1(line_ending, p_valve)(input)
-}
-
-fn p_valve(input: &str) -> IResult<&str, Valve> {
-    let (input, name) = preceded(tag("Valve "), take(2usize))(input)?;
-    let (input, flow) = preceded(tag(" has flow rate="), i64)(input)?;
-    let (input, exit) = preceded(
-        alt((
-            tag("; tunnels lead to valves "),
-            tag("; tunnel leads to valve "),
-        )),
-        separated_list1(tag(", "), take(2usize)),
-    )(input)?;
-
-    Ok((input, Valve { name, flow, exit }))
-}
-
+// State of the valve, used for know what to do with each valve
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct State {
     remaining: i64,
@@ -148,6 +159,7 @@ struct State {
     opened: BitSet,
 }
 
+// Changing the states
 impl State {
     fn new(valves: &HashMap<usize, IdValve>, start: usize) -> Self {
         let mut opened = BitSet::new();
@@ -248,6 +260,8 @@ impl BitSet {
     }
 }
 
+// Second Part: 
+// State of the elephant
 #[derive(Clone, PartialEq, Eq, Hash)]
 struct StateWithElephant {
     remaining: i64,
@@ -255,6 +269,7 @@ struct StateWithElephant {
     opened: BitSet,
 }
 
+// Changing the state of the elephant
 impl StateWithElephant {
     fn new(valves: &HashMap<usize, IdValve>, start: usize) -> Self {
         let mut opened = BitSet::new();
@@ -343,6 +358,7 @@ impl StateWithElephant {
     }
 }
 
+// Calculating the cost of each valve
 fn one_actor_cost(
     state: &State,
     valves: &HashMap<usize, IdValve>,
@@ -358,6 +374,8 @@ fn one_actor_cost(
     cost
 }
 
+
+// Part one function
 fn part_one(valves: &HashMap<usize, IdValve>, start: usize) -> i64 {
     let mut sorted_by_flow: Vec<(usize, i64)> = valves.values().map(|v| (v.name, v.flow)).collect();
     sorted_by_flow.sort_by_key(|(_, f)| *f);
@@ -366,6 +384,7 @@ fn part_one(valves: &HashMap<usize, IdValve>, start: usize) -> i64 {
     -one_actor_cost(&State::new(valves, start), valves, &sorted_by_flow)
 }
 
+// Second part function
 fn part_two(valves: &HashMap<usize, IdValve>, start: usize) -> i64 {
     let mut sorted_by_flow: Vec<(usize, i64)> = valves.values().map(|v| (v.name, v.flow)).collect();
     sorted_by_flow.sort_by_key(|(_, f)| *f);
@@ -382,6 +401,7 @@ fn part_two(valves: &HashMap<usize, IdValve>, start: usize) -> i64 {
     -cost
 }
     
+// main function 
 fn main() {
          const INPUT: &str = "Valve AA has flow rate=0; tunnels lead to valves DD, II, BB
 Valve BB has flow rate=13; tunnels lead to valves CC, AA
@@ -396,7 +416,7 @@ Valve JJ has flow rate=21; tunnel leads to valve II";
         let valves = parse(INPUT);
         let compressed = compress(&valves);
         let (ids, start) = identifiers(&compressed);
-        println!("{:?}", part_one(&ids, start));
         
+        println!("{:?}", part_one(&ids, start));  
         println!("{:?}", part_two(&ids, start));
 } 
