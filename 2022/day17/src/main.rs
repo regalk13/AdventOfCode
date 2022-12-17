@@ -62,7 +62,7 @@ fn solve(input: &str) {
 
 fn main() {
 
-    let file = std::fs::read_to_string("./input.in").expect("Excpeted");
+    let file = std::fs::read_to_string("./input").expect("Excpeted");
 
     solve(&file);
 }
