@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 use itertools::Itertools;
 
+// Defining state of current blueprint process
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Hash)]
 struct State {
     time_left: i32,
@@ -13,6 +14,8 @@ struct State {
     obs_robot: i32,
     geode_robot: i32,
 }
+
+// Blueprint values
 #[derive(Debug, PartialEq, Eq)]
 struct Blueprint {
     idx: i32,
@@ -24,14 +27,17 @@ struct Blueprint {
     geode_cost_in_obsidian: i32,
 }
 
-pub fn first_part(input: &str) ->i32 {
+// First part function
+fn first_part(input: &str) ->i32 {
+    // Get blueprints
     let blueprints = parse(input);
+    // Return the value of the function get_best and multiply by the inndex
     blueprints
         .iter()
-        .map(|b| {
-            b.idx
+        .map(|i| {
+            i.idx
                 * get_best(
-                    &b,
+                    &i,
                     State {
                         time_left: 24,
                         ore: 0,
@@ -47,8 +53,12 @@ pub fn first_part(input: &str) ->i32 {
         })
         .sum()
 }
-pub fn second_part(input: &str) -> i32 {
+
+// Second part solution
+fn second_part(input: &str) -> i32 {
+    // Parsing input
     let blueprints = parse(input);
+    // Take first 3 blueprints and multply by the best sequence of blueprints
     blueprints
         .iter()
         .take(3)
@@ -71,18 +81,19 @@ pub fn second_part(input: &str) -> i32 {
         .product()
 }
 
+// Get the best of blue prints!
 fn get_best(blueprint: &Blueprint, start_state: State) -> i32 {
     let mut scanned: HashSet<State> = HashSet::with_capacity(50 * 1024 * 1024);
     let mut to_scan = Vec::with_capacity(50 * 1024 * 1024);
     to_scan.push(start_state);
 
-    // we use the current best state in terms of geodes
+    // We use the current best state in terms of geodes
     // to discover if the evaluated state that will always be worse than the current best
     // if it is, we stop there.
     let mut best_geode = 0;
     let mut best_state = State::default();
 
-    // as we can only build one robot a turn,
+    // As we can only build one robot a turn,
     // there is no point in producing more than what we can spend
     let max_ore = *[
         blueprint.clay_cost_in_ore,
@@ -92,7 +103,8 @@ fn get_best(blueprint: &Blueprint, start_state: State) -> i32 {
     ]
     .iter()
     .max()
-    .unwrap();
+	.unwrap();
+    
     let max_obsidian = blueprint.geode_cost_in_obsidian;
     let max_clay = blueprint.obs_cost_in_clay;
 
@@ -165,10 +177,12 @@ fn get_best(blueprint: &Blueprint, start_state: State) -> i32 {
     best_geode
 }
 
+// Return bool to know if we need more mineral current ask
 fn dont_need_more(time_left: i32, stock: i32, robots: i32, max: i32) -> bool {
     robots >= max || time_left * robots + stock > time_left * max
 }
 
+// Return the works state between two states
 fn worse(max: State, other: State) -> bool {
     (max.time_left == other.time_left
         && max.geode_robot >= other.geode_robot
@@ -185,6 +199,7 @@ fn worse(max: State, other: State) -> bool {
             <= max.geode + max.geode_robot * max.time_left
 }
 
+// Dig into the state
 fn dig(mut state: State) -> State {
     state.ore += state.ore_robot;
     state.clay += state.clay_robot;
@@ -194,6 +209,7 @@ fn dig(mut state: State) -> State {
     state
 }
 
+// Parsing the input, returning a vec of blueprints
 fn parse(input: &str) -> Vec<Blueprint> {
     input
         .lines()
@@ -213,7 +229,9 @@ fn parse(input: &str) -> Vec<Blueprint> {
 }
 
 fn main() {
+    // Getting the input file
     let file = std::fs::read_to_string("./input").expect("Expected file");
+
     println!("Output 1: {:?}", first_part(&file));
     println!("Output 2: {:?}", second_part(&file));
 }
