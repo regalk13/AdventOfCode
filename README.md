@@ -2,7 +2,7 @@
 
 🎄 | Advent Of Code solutions in rust 
 <br>
-![image](https://user-images.githubusercontent.com/72028266/208509296-88bf8b65-680d-4312-b370-d463471f6402.png)
+![image](https://user-images.githubusercontent.com/72028266/208723204-01e3d9ef-9733-4a48-aa06-b8a1a40338e9.png)
 
 <br>
 
