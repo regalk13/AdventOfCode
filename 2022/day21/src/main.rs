@@ -2,49 +2,28 @@ use std::collections::HashMap;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 enum Operation {
-    Sum(String, String),
-    Sub(String, String),
-    Mtp(String, String),
-    Div(String, String),
+    Add,
+    Sub,
+    Mult,
+    Div
 }
 
 impl Operation {
-    fn new(value: &str) -> Self {
-        if value.contains("+") {
-            let (op1, op2) = value.split_once("+").unwrap();
-            return Operation::Sum(op1.to_string(), op2.to_string());
-        } else if value.contains("-") {
-            let (op1, op2) = value.split_once("-").unwrap();
-            return Operation::Sub(op1.to_string(), op2.to_string());
-        } else if value.contains("/") {
-            let (op1, op2) = value.split_once("/").unwrap();
-            return Operation::Div(op1.to_string(), op2.to_string());
-        } else {
-            let (op1, op2) = value.split_once("*").unwrap();
-            return Operation::Mtp(op1.to_string(), op2.to_string());
+    fn parse(ch: char) -> Self {
+        match ch {
+            '+' => Self::Add,
+            '-' => Self::Sub,
+            '*' => Self::Mult,
+            '/'=> Self::Div,
+            _ => panic!("Invalid operation: {}", ch),
         }
     }
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 enum Value {
-    Integer(i32),
-    Op(Operation),
-}
-
-impl Value {
-    fn new(value: &str) -> Self {
-        if value.len() <= 3 {
-            return Value::Integer(value.parse::<i32>().unwrap());
-        } else {
-            return Value::Op(Operation::new(value));
-        }
-    }
-
-}
-
-fn make_operation(op: Value, op2: Value) {
-
+    Integer(i64),
+    Op(String, Operation, String),
 }
 
 fn parser(file: &str) -> HashMap<String, Value> {
@@ -53,34 +32,44 @@ fn parser(file: &str) -> HashMap<String, Value> {
         .lines()
         .map(|line| {
             let (name, value) = line.split_once(": ").unwrap();
-            (name.to_string(), Value::new(value.trim()))
+            
+            if let Ok(num) = value.parse::<i64>()
+            {
+                (name.to_string(), Value::Integer(num))
+            } else 
+            {
+                let expr = value.split_whitespace().collect::<Vec<&str>>();
+                (name.to_string(), Value::Op(expr[0].to_string(), Operation::parse(expr[1].chars().next().unwrap()), expr[2].to_string()))
+            }
+
         })
         .collect::<HashMap<String, Value>>()
 }
 
-fn search_value(hash: HashMap<String, Value>, key: String) -> Value {
-   let value = &hash[&key];
+fn make_operation(hash: &HashMap<String, Value>, key: &String) -> i64 {
+   let value = hash.get(key).unwrap();
     match value {
-        Value::Integer(_) => {
-            value.clone()
-        }
-        Value::Op(_) => {
-            /*
-            if let Value::Op(value) = value {
-                value.make_operation();
-            }*/
-            value.clone()
+        Value::Integer(v) => *v,
+        Value::Op(l, op, r) => {
+            let l = make_operation(hash, l);
+            let r = make_operation(hash, r);
+            match op {
+                Operation::Add => l + r,
+                Operation::Sub => l - r,
+                Operation::Mult => l * r,
+                Operation::Div => l / r,
+            }
         }
     }
 }
 
-fn first_part(file: &str) {
+fn first_part(file: &str) -> i64 {
     let hash_parsed = parser(file);
-    let output = search_value(hash_parsed, "root".to_string());
+    make_operation(&hash_parsed, &"root".to_string())
 
 }
 fn main() {
-    let file = std::fs::read_to_string("./input.test").expect("Couldn't read input file");
+    let file = std::fs::read_to_string("./input").expect("Couldn't read input file");
 
-    first_part(&file);
+    println!("Output 1: {:?}", first_part(&file));
 }
