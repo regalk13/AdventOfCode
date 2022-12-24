@@ -1,99 +1,285 @@
 use num::integer::Integer;
-use std::collections::{HashSet, VecDeque};
 
-struct Valley {
-    blizzards: Vec<HashSet<(i32, i32)>>,
-    r: i32,
-    c: i32,
+use std::cmp::Ordering;
+use std::collections::{BinaryHeap, HashMap};
+
+#[derive(Copy, Clone)]
+pub struct Pos {
+    x: usize,
+    y: usize,
 }
 
-impl Valley {
-    fn new(file: &str) -> Self {
-        let mut blizzarrds: Vec<HashSet<(i32, i32)>> = [
-            HashSet::new(),
-            HashSet::new(),
-            HashSet::new(),
-            HashSet::new(),
-        ]
-        .to_vec();
-        let mut r_ = 0;
-        let mut c_ = 0;
-        for (r, line) in file.trim().lines().collect::<Vec<&str>>()[1..]
-            .iter()
-            .enumerate()
-        {
-            for (c, item) in line.chars().collect::<Vec<char>>()[1..].iter().enumerate() {
-                match item {
-                    '<' => blizzarrds[0].insert((r as i32, c as i32)),
-                    '>' => blizzarrds[1].insert((r as i32, c as i32)),
-                    '^' => blizzarrds[2].insert((r as i32, c as i32)),
-                    'v' => blizzarrds[3].insert((r as i32, c as i32)),
-                    _ => false,
-                };
-                c_ = c;
-            }
-            r_ = r;
+impl Pos {
+    fn new(x: usize, y: usize) -> Pos {
+        Pos { x, y }
+    }
+}
+
+type Bitmask = u128;
+
+#[derive(Eq, PartialEq)]
+struct Cell {
+    n: Bitmask,
+    s: Bitmask,
+    e: Bitmask,
+    w: Bitmask,
+}
+
+impl Cell {
+    fn wall() -> Cell {
+        Cell {
+            n: Bitmask::MAX,
+            s: Bitmask::MAX,
+            e: Bitmask::MAX,
+            w: Bitmask::MAX,
         }
-        Valley {
-            blizzards: blizzarrds,
-            r: r_ as i32,
-            c: c_ as i32,
+    }
+    fn empty() -> Cell {
+        Cell {
+            n: 0,
+            s: 0,
+            e: 0,
+            w: 0,
+        }
+    }
+    fn north() -> Cell {
+        Cell {
+            n: 1,
+            s: 0,
+            e: 0,
+            w: 0,
+        }
+    }
+    fn south() -> Cell {
+        Cell {
+            n: 0,
+            s: 1,
+            e: 0,
+            w: 0,
+        }
+    }
+    fn east() -> Cell {
+        Cell {
+            n: 0,
+            s: 0,
+            e: 1,
+            w: 0,
+        }
+    }
+    fn west() -> Cell {
+        Cell {
+            n: 0,
+            s: 0,
+            e: 0,
+            w: 1,
         }
     }
 }
 
-fn first_part(file: &str) {
-    let valley = Valley::new(file);
-    let mut queue = VecDeque::from([(0, -1, 0)]);
-    let mut seen = HashSet::new();
-    let (r, c) = (valley.r, valley.c);
-    let target = (r, c - 1);
-    let lcm = r * c / r.gcd(&c);
-    while queue.len() > 0 {
-        let current = queue.pop_front().unwrap();
-        let mut time = current.0;
-        let cr = current.1;
-        let cc = current.2;    
-        time += 1;
-        
-        for (dr, dc) in [(0, 1), (0, -1), (-1, 0), (1, 0), (0, 0)] {
-            let mut pass = true;
-            let nr = cr + dr;
-            let nc = cc + dc;
-            if (nr, nc) == target {
-                println!("time: {:?}", time);
+pub struct Map {
+    width: usize,
+    height: usize,
+    pub start: Pos,
+    pub finish: Pos,
+    grid: Vec<Cell>,
+}
+
+impl Map {
+    pub fn parse(input: &str) -> Map {
+        let lines: Vec<&str> = input.lines().collect();
+        let first = lines.first().unwrap();
+        let last = lines.last().unwrap();
+        let width = first.len();
+        let height = lines.len();
+        let start_x = first.chars().position(|c| c == '.').unwrap();
+        let finish_x = last.chars().position(|c| c == '.').unwrap();
+        let mut grid = Vec::with_capacity(width * height);
+        for (y, line) in lines.iter().enumerate() {
+            assert_eq!(line.len(), width);
+            for (x, c) in line.chars().enumerate() {
+                grid.push(match c {
+                    '#' => {
+                        assert!(x == 0 || y == 0 || x == width - 1 || y == height - 1);
+                        Cell::wall()
+                    }
+                    '.' => Cell::empty(),
+                    '^' => Cell::north(),
+                    'v' => Cell::south(),
+                    '<' => Cell::west(),
+                    '>' => Cell::east(),
+                    _ => unreachable!(),
+                });
             }
-        
-           if (nr < 0 || nc < 0 || nr >= r || nc >= c) && !((nr, nc) == (-1, 0)) {
+        }
+        let mut map = Map {
+            width,
+            height,
+            start: Pos::new(start_x, 0),
+            finish: Pos::new(finish_x, height - 1),
+            grid,
+        };
+        map.propagate_winds();
+        map
+    }
+
+    fn cell(&self, x: usize, y: usize) -> Option<&Cell> {
+        if x >= self.width || y >= self.height {
+            return None;
+        }
+        Some(&self.grid[y * self.width + x])
+    }
+
+    fn cell_mut(&mut self, x: usize, y: usize) -> Option<&mut Cell> {
+        if x >= self.width || y >= self.height {
+            return None;
+        }
+        Some(&mut self.grid[y * self.width + x])
+    }
+
+    fn cell_is_wall(&self, x: usize, y: usize) -> bool {
+        let wall = Cell::wall();
+        let cell = self.cell(x, y).unwrap_or(&wall);
+        *cell == wall
+    }
+
+    fn longest_cycle(&self) -> usize {
+        let e_w_cycle = self.width - 2;
+        let n_s_cycle = self.height - 2;
+        e_w_cycle.lcm(&n_s_cycle)
+    }
+
+    fn cell_is_safe(&self, x: usize, y: usize, t: usize) -> bool {
+        let e_w_cycle = self.width - 2;
+        let n_s_cycle = self.height - 2;
+        let e_w_t = t % e_w_cycle;
+        let n_s_t = t % n_s_cycle;
+        let wall = Cell::wall();
+        let cell = self.cell(x, y).unwrap_or(&wall);
+        (cell.e >> e_w_t) & 1 == 0
+            && (cell.w >> e_w_t) & 1 == 0
+            && (cell.n >> n_s_t) & 1 == 0
+            && (cell.s >> n_s_t) & 1 == 0
+    }
+
+    fn propagate_winds(&mut self) {
+        let e_w_cycle = self.width - 2;
+        let n_s_cycle = self.height - 2;
+        for y in 1..self.height - 1 {
+            for x in 1..self.width - 1 {
+                for t in 1..e_w_cycle {
+                    let w_wind = 1 + (x - 1 + t) % e_w_cycle;
+                    let e_wind = 1 + (x - 1 + e_w_cycle - t) % e_w_cycle;
+                    self.cell_mut(x, y).unwrap().e |= (self.cell(e_wind, y).unwrap().e & 1) << t;
+                    self.cell_mut(x, y).unwrap().w |= (self.cell(w_wind, y).unwrap().w & 1) << t;
+                }
+                for t in 1..n_s_cycle {
+                    let s_wind = 1 + (y - 1 + n_s_cycle - t) % n_s_cycle;
+                    let n_wind = 1 + (y - 1 + t) % n_s_cycle;
+                    self.cell_mut(x, y).unwrap().n |= (self.cell(x, n_wind).unwrap().n & 1) << t;
+                    self.cell_mut(x, y).unwrap().s |= (self.cell(x, s_wind).unwrap().s & 1) << t;
+                }
+            }
+        }
+    }
+}
+#[derive(Copy, Clone, Eq, PartialEq)]
+struct State {
+    x: usize,
+    y: usize,
+    cycle: usize,
+    t: usize,
+}
+
+impl Ord for State {
+    fn cmp(&self, other: &Self) -> Ordering {
+        other
+            .t
+            .cmp(&self.t)
+            .then_with(|| self.x.cmp(&other.x))
+            .then_with(|| self.y.cmp(&other.y))
+            .then_with(|| self.cycle.cmp(&other.cycle))
+    }
+}
+
+impl PartialOrd for State {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+pub fn dijkstra(map: &Map, start: Pos, start_time: usize, finish: Pos) -> usize {
+    let mut earliest_time = HashMap::new();
+    let mut queue = BinaryHeap::new();
+    let longest_cycle = map.longest_cycle();
+    earliest_time.insert((start.x, start.y, start_time % longest_cycle), start_time);
+    queue.push(State {
+        x: start.x,
+        y: start.y,
+        cycle: start_time % longest_cycle,
+        t: start_time,
+    });
+    while let Some(State {
+        x: ux,
+        y: uy,
+        cycle,
+        t: ut,
+    }) = queue.pop()
+    {
+        if ut > earliest_time[&(ux, uy, cycle)] {
+            continue;
+        }
+        for (dx, dy) in [(0, 1), (0, -1), (1, 0), (-1, 0)] {
+            let vx = ux.wrapping_add_signed(dx);
+            let vy = uy.wrapping_add_signed(dy);
+            if (vx, vy) == (finish.x, finish.y) {
+                let vt = ut + 1;
+                earliest_time.insert((vx, vy, vt % longest_cycle), vt);
+                return vt;
+            }
+            if map.cell_is_wall(vx, vy) {
                 continue;
             }
-       
-            for (i, tr, tc) in [(0, 0, -1), (1, 0, 1), (2, -1, 0), (3, 1, 0)] {
-                let contained = ((nr - tr * time) % r, (nc - tc * time) % c);
-                if valley.blizzards[i].contains(&contained) {
-                    pass = false;
+            for vt in ut + 1..ut + longest_cycle + 1 {
+                if map.cell_is_safe(vx, vy, vt) {
+                    if vt
+                        < *earliest_time
+                            .get(&(vx, vy, vt % longest_cycle))
+                            .unwrap_or(&usize::MAX)
+                    {
+                        earliest_time.insert((vx, vy, vt % longest_cycle), vt);
+                        queue.push(State {
+                            x: vx,
+                            y: vy,
+                            cycle: vt % longest_cycle,
+                            t: vt,
+                        });
+                    }
+                    break;
+                }
+                if !map.cell_is_safe(ux, uy, vt) {
                     break;
                 }
             }
-            if pass == true {
-                let key = (nr, nc, time % lcm);
-
-                if seen.contains(&key) {
-                    continue;
-                }
-
-                seen.insert(key);
-
-                queue.push_back((time, nr, nc));
-            }
         }
     }
+    unreachable!()
+}
+
+pub fn first_part(input: &str) -> usize {
+    let map = Map::parse(input);
+    dijkstra(&map, map.start, 0, map.finish)
+}
+
+fn second_part(input: &str) -> usize {
+    let map = Map::parse(input);
+    let t1 = dijkstra(&map, map.start, 0, map.finish);
+    let t2 = dijkstra(&map, map.finish, t1, map.start);
+    dijkstra(&map, map.start, t2, map.finish)
 }
 
 fn main() {
-    let file = std::fs::read_to_string("./input").expect("couldn't open input file :(");
+    let file = std::fs::read_to_string("./input").expect("couldn't read input file");
 
-    first_part(&file);
-
-    println!("{}", file);
+    println!("Output 1: {}", first_part(&file));
+    println!("Output 2: {}", second_part(&file));
 }
