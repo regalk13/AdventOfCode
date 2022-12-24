@@ -15,8 +15,8 @@ impl Elves {
         let mut elves: HashSet<Complex<i32>> = HashSet::new();
         // Parsing the input
         for (r, line) in inp_vec.iter().enumerate() {
-            for (c, item) in line.chars().collect::<Vec<char>>().iter().enumerate() {
-                if *item == '#' {
+            for (c, item) in line.chars().enumerate() {
+                if item == '#' {
                     elves.insert(c as i32 + r as i32 * I_COM);
                 }
             }

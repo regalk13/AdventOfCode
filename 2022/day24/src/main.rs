@@ -3,12 +3,15 @@ use num::integer::Integer;
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap};
 
+// Posisition struct
+// can't use complex numbers cause module operations
 #[derive(Copy, Clone)]
-pub struct Pos {
+struct Pos {
     x: usize,
     y: usize,
 }
 
+// Builder pos struct
 impl Pos {
     fn new(x: usize, y: usize) -> Pos {
         Pos { x, y }
@@ -17,6 +20,7 @@ impl Pos {
 
 type Bitmask = u128;
 
+// Creathe the cell of posible moves
 #[derive(Eq, PartialEq)]
 struct Cell {
     n: Bitmask,
@@ -25,6 +29,7 @@ struct Cell {
     w: Bitmask,
 }
 
+// Position and define walls 
 impl Cell {
     fn wall() -> Cell {
         Cell {
@@ -34,6 +39,7 @@ impl Cell {
             w: Bitmask::MAX,
         }
     }
+    // don't move
     fn empty() -> Cell {
         Cell {
             n: 0,
@@ -42,6 +48,7 @@ impl Cell {
             w: 0,
         }
     }
+    // move up
     fn north() -> Cell {
         Cell {
             n: 1,
@@ -50,6 +57,7 @@ impl Cell {
             w: 0,
         }
     }
+    // move down
     fn south() -> Cell {
         Cell {
             n: 0,
@@ -58,6 +66,7 @@ impl Cell {
             w: 0,
         }
     }
+    // move right
     fn east() -> Cell {
         Cell {
             n: 0,
@@ -66,6 +75,7 @@ impl Cell {
             w: 0,
         }
     }
+    // move left
     fn west() -> Cell {
         Cell {
             n: 0,
@@ -76,15 +86,18 @@ impl Cell {
     }
 }
 
-pub struct Map {
+// Definin the map
+struct Map {
     width: usize,
     height: usize,
-    pub start: Pos,
-    pub finish: Pos,
+    start: Pos,
+    finish: Pos,
     grid: Vec<Cell>,
 }
 
+// implement the map
 impl Map {
+    // parsing the input  in a grid
     pub fn parse(input: &str) -> Map {
         let lines: Vec<&str> = input.lines().collect();
         let first = lines.first().unwrap();
@@ -121,7 +134,7 @@ impl Map {
         map.propagate_winds();
         map
     }
-
+    // creating the cells
     fn cell(&self, x: usize, y: usize) -> Option<&Cell> {
         if x >= self.width || y >= self.height {
             return None;
@@ -160,7 +173,7 @@ impl Map {
             && (cell.n >> n_s_t) & 1 == 0
             && (cell.s >> n_s_t) & 1 == 0
     }
-
+    // blizzards moving each time
     fn propagate_winds(&mut self) {
         let e_w_cycle = self.width - 2;
         let n_s_cycle = self.height - 2;
@@ -182,6 +195,7 @@ impl Map {
         }
     }
 }
+
 #[derive(Copy, Clone, Eq, PartialEq)]
 struct State {
     x: usize,
@@ -207,7 +221,8 @@ impl PartialOrd for State {
     }
 }
 
-pub fn dijkstra(map: &Map, start: Pos, start_time: usize, finish: Pos) -> usize {
+// dijkstra function to find the best moves to reach the end in less time
+fn dijkstra(map: &Map, start: Pos, start_time: usize, finish: Pos) -> usize {
     let mut earliest_time = HashMap::new();
     let mut queue = BinaryHeap::new();
     let longest_cycle = map.longest_cycle();
@@ -265,11 +280,12 @@ pub fn dijkstra(map: &Map, start: Pos, start_time: usize, finish: Pos) -> usize 
     unreachable!()
 }
 
-pub fn first_part(input: &str) -> usize {
+fn first_part(input: &str) -> usize {
     let map = Map::parse(input);
     dijkstra(&map, map.start, 0, map.finish)
 }
 
+// two searchs dijsktra to get back to the start and then go back to the final position
 fn second_part(input: &str) -> usize {
     let map = Map::parse(input);
     let t1 = dijkstra(&map, map.start, 0, map.finish);
@@ -277,6 +293,7 @@ fn second_part(input: &str) -> usize {
     dijkstra(&map, map.start, t2, map.finish)
 }
 
+// main function
 fn main() {
     let file = std::fs::read_to_string("./input").expect("couldn't read input file");
 
