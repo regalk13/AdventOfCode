@@ -1,9 +1,10 @@
-# Advent Of Code
+<h1 align="center">Advent Of Code</h1>
 
 🎄 | Advent Of Code solutions in rust 
 <br>
-![image](https://user-images.githubusercontent.com/72028266/209440003-57d2b61d-93f5-4ab8-8890-f1957a1a7323.png)
-
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/72028266/209473755-396c7837-ceaf-46b1-9745-e1a13ffec34b.png" />
+</div>
 
 <br>
 
