@@ -1,9 +1,9 @@
 #![feature(iter_array_chunks)]
 #![feature(iter_intersperse)]
 
-mod year2022;
+mod aoc2022;
 
-use year2022::*;
+use aoc2022::*;
 
 pub trait Runit {
     fn parse(&mut self);
@@ -12,9 +12,35 @@ pub trait Runit {
 }
 
 fn main() {
-    println!("Hello, world!!");
-    let mut day = year2022::day01::AocDay01::new();
+    let args = std::env::args().collect::<Vec<String>>();
+
+    if args.len() < 3 {
+        println!("Invalid usage");
+        println!("Example of use: cargo run [year] [day]");
+        std::process::exit(1);
+    }
+
+    let years = vec![run_2022];
+    
+    if let Ok(year) = args[1].parse::<u32>() {
+        if (2015..=2022).contains(&year) {
+            if let Ok(day_) = args[2].parse::<u32>() {
+                years[year as usize - 2022](day_)
+            } else {
+                println!("Invalid day: {:?}", args[2])
+            }
+        } else {
+            println!("Invalid year, valid format example: 2022");
+        }
+    } else {
+        println!("Invalid year, valid format example: 2022");
+    }
+
+}
+
+pub fn run<T: Runit + ?Sized>(day: &mut T) {
     day.parse();
-    println!("Output 1: {}", day.first_part());
-    println!("Output 2: {}", day.second_part());
+
+    println!("Part 1 {}", day.first_part());
+    println!("Part 2 {}", day.second_part());
 }
