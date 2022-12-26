@@ -1,6 +1,5 @@
 pub fn main() {
-    let file = std::fs::read_to_string("./input/2022/input_day01")
-        .expect("Invalid input");
+    let file = advent_of_code::read_file("2022".to_string(), "01".to_string());
 
     let mut i = 0;
     let mut vector: Vec<u32> = Vec::new();
