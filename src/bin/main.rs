@@ -1,6 +1,9 @@
-mod 2022;
-use 2022::*;
+mod year2022;
+
+use year2022::*;
 
 fn main() {
-    println!("Hello, world!");
+    println!("Hello, world!!");
+    run();    
 }
+
