@@ -1,5 +1,5 @@
-use std::collections::HashSet;
 use itertools::Itertools;
+use std::collections::HashSet;
 
 // Defining state of current blueprint process
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Hash)]
@@ -28,7 +28,7 @@ struct Blueprint {
 }
 
 // First part function
-fn first_part(input: &str) ->i32 {
+fn first_part(input: &str) -> i32 {
     // Get blueprints
     let blueprints = parse(input);
     // Return the value of the function get_best and multiply by the inndex
@@ -103,8 +103,8 @@ fn get_best(blueprint: &Blueprint, start_state: State) -> i32 {
     ]
     .iter()
     .max()
-	.unwrap();
-    
+    .unwrap();
+
     let max_obsidian = blueprint.geode_cost_in_obsidian;
     let max_clay = blueprint.obs_cost_in_clay;
 

@@ -20,82 +20,81 @@ impl Val {
         let mut num = -1;
         while let Some(ch) = c.next() {
             match ch {
-            '[' => result.push(Self::parse_into(c)),
-            ',' => {
+                '[' => result.push(Self::parse_into(c)),
+                ',' => {
                     if num >= 0 {
-                        result.push(Self::Number(num)); 
+                        result.push(Self::Number(num));
                         num = -1;
                     }
-            }
-            ']' => {
-                if num >= 0 {
-                    result.push(Self::Number(num));
                 }
-                return Self::List(result)},
-            '0'..='9' => { 
-                if num == -1 {
-                    num = (ch as u8 - b'0') as i32;
-                } else {
-                    num = (num * 10) + (ch as u8 - b'0') as i32
+                ']' => {
+                    if num >= 0 {
+                        result.push(Self::Number(num));
+                    }
+                    return Self::List(result);
                 }
-            },
-            _ => panic!("Signal in bad state or smth '{ch}'"),
+                '0'..='9' => {
+                    if num == -1 {
+                        num = (ch as u8 - b'0') as i32;
+                    } else {
+                        num = (num * 10) + (ch as u8 - b'0') as i32
+                    }
+                }
+                _ => panic!("Signal in bad state or smth '{ch}'"),
             }
-            }
+        }
         Val::List(result)
     }
     fn compare(&self, other: &Self) -> Ordering {
-        match(self, other) {
+        match (self, other) {
             (Val::List(left), Val::List(right)) => {
                 let mut idx = 0;
                 loop {
-                if left.len() <= idx || right.len() <= idx {
-                    if left.len() < right.len() {
-                        return Ordering::Less;
-                    } else if left.len() == right.len() {
-                        return Ordering::Equal;
-                    } else {
-                        return Ordering::Greater;
-                    }
-                }
-                match (&left[idx], &right[idx]) {
-                    (Val::Number(l), Val::Number(r)) => 
-                    {
-                        if l < r { 
-                            return Ordering::Less; 
-                        } else if l > r {
+                    if left.len() <= idx || right.len() <= idx {
+                        if left.len() < right.len() {
+                            return Ordering::Less;
+                        } else if left.len() == right.len() {
+                            return Ordering::Equal;
+                        } else {
                             return Ordering::Greater;
                         }
                     }
-                    (Val::List(_), Val::Number(r)) => {
-                        let check = left[idx].compare(&Val::List(vec![Val::Number(*r)]));
-                        if check != Ordering::Equal {
-                            return check;
+                    match (&left[idx], &right[idx]) {
+                        (Val::Number(l), Val::Number(r)) => {
+                            if l < r {
+                                return Ordering::Less;
+                            } else if l > r {
+                                return Ordering::Greater;
+                            }
+                        }
+                        (Val::List(_), Val::Number(r)) => {
+                            let check = left[idx].compare(&Val::List(vec![Val::Number(*r)]));
+                            if check != Ordering::Equal {
+                                return check;
+                            }
+                        }
+                        (Val::Number(l), Val::List(_)) => {
+                            let check = Val::List(vec![Val::Number(*l)]).compare(&right[idx]);
+                            if check != Ordering::Equal {
+                                return check;
+                            }
+                        }
+                        (Val::List(_), Val::List(_)) => {
+                            let check = left[idx].compare(&right[idx]);
+                            if check != Ordering::Equal {
+                                return check;
+                            }
                         }
                     }
-                    (Val::Number(l), Val::List(_)) => {
-                        let check = Val::List(vec![Val::Number(*l)]).compare(&right[idx]);
-                        if check != Ordering::Equal {
-                            return check;
-                        }
-                    }
-                    (Val::List(_), Val::List(_)) => {
-                        let check = left[idx].compare(&right[idx]);
-                        if check != Ordering::Equal {
-                            return check;
-                        }
-                    }
+                    idx += 1;
                 }
-                idx += 1;
             }
-        }
-         _ => panic!("Invalid input")        
+            _ => panic!("Invalid input"),
         }
     }
 }
 
 impl PartialOrd for Val {
-
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.compare(other))
     }
@@ -107,12 +106,12 @@ impl Ord for Val {
     }
 }
 
-fn second_part(file: &str)  {
+fn second_part(file: &str) {
     let signals = file.split("\n").filter(|f| *f != "").collect::<Vec<&str>>();
-    
+
     let mut output = 1;
     let mut pairs: Vec<Val> = vec![];
-    
+
     for pair in signals {
         pairs.push(Val::parse(pair));
     }
@@ -123,7 +122,7 @@ fn second_part(file: &str)  {
     list.extend(pairs.iter().cloned());
 
     list.sort();
-    
+
     for (index, value) in list.iter().enumerate() {
         if *value == d2 || *value == d6 {
             output *= index + 1;
@@ -134,10 +133,10 @@ fn second_part(file: &str)  {
 
 fn first_part(file: &str) {
     let signals = file.split("\n").filter(|f| *f != "").collect::<Vec<&str>>();
-    
+
     let mut output = 0;
     let mut pairs: Vec<Val> = vec![];
-    
+
     for pair in signals {
         pairs.push(Val::parse(pair));
     }
@@ -152,8 +151,6 @@ fn first_part(file: &str) {
 
 fn main() {
     let file = std::fs::read_to_string("./input").expect("Can't read the signal input");
-    
-    
 
     first_part(&file);
     second_part(&file);

@@ -3,15 +3,23 @@ fn second_part(file: String) -> u32 {
     let mut visibles = vec![];
     for (i, f) in binding.iter().enumerate() {
         for (n, j) in f.chars().collect::<Vec<char>>().iter().enumerate() {
-            if n <= 0 || n >= binding.len()-2 || i <= 0 || i >= binding.len()-2 {
-                continue 
+            if n <= 0 || n >= binding.len() - 2 || i <= 0 || i >= binding.len() - 2 {
+                continue;
             }
             let current = j.to_digit(10).unwrap();
-            let up = binding[i-1].chars().collect::<Vec<char>>()[n].to_digit(10).unwrap();
-            let down = binding[i+1].chars().collect::<Vec<char>>()[n].to_digit(10).unwrap();
-            let left = binding[i].chars().collect::<Vec<char>>()[n-1].to_digit(10).unwrap();
-            let right = binding[i].chars().collect::<Vec<char>>()[n+1].to_digit(10).unwrap();
-            
+            let up = binding[i - 1].chars().collect::<Vec<char>>()[n]
+                .to_digit(10)
+                .unwrap();
+            let down = binding[i + 1].chars().collect::<Vec<char>>()[n]
+                .to_digit(10)
+                .unwrap();
+            let left = binding[i].chars().collect::<Vec<char>>()[n - 1]
+                .to_digit(10)
+                .unwrap();
+            let right = binding[i].chars().collect::<Vec<char>>()[n + 1]
+                .to_digit(10)
+                .unwrap();
+
             let mut count_up = 0;
             let mut count_down = 0;
             let mut count_right = 0;
@@ -20,30 +28,35 @@ fn second_part(file: String) -> u32 {
             if up < current {
                 let mut m = 1;
                 while i >= m {
-                    if binding[i-m].chars().collect::<Vec<char>>()[n].to_digit(10).unwrap() < current {
+                    if binding[i - m].chars().collect::<Vec<char>>()[n]
+                        .to_digit(10)
+                        .unwrap()
+                        < current
+                    {
                         count_up += 1;
                         m += 1;
-                    }
-                    else {
+                    } else {
                         count_up += 1;
-                        break
+                        break;
                     }
-                } 
+                }
             } else {
-
                 count_up += 1
             }
 
             if down < current {
                 let mut m = 1;
-                while m <= (binding.len()-2-i) {
-                    if binding[i+m].chars().collect::<Vec<char>>()[n].to_digit(10).unwrap() < current {
+                while m <= (binding.len() - 2 - i) {
+                    if binding[i + m].chars().collect::<Vec<char>>()[n]
+                        .to_digit(10)
+                        .unwrap()
+                        < current
+                    {
                         count_down += 1;
                         m += 1;
-                    }
-                    else {
+                    } else {
                         count_down += 1;
-                        break 
+                        break;
                     }
                 }
             } else {
@@ -52,14 +65,17 @@ fn second_part(file: String) -> u32 {
 
             if right < current {
                 let mut m = 1;
-                while (n+m) <= (binding.len()-2) {
-                    if binding[i].chars().collect::<Vec<char>>()[n+m].to_digit(10).unwrap() < current {
+                while (n + m) <= (binding.len() - 2) {
+                    if binding[i].chars().collect::<Vec<char>>()[n + m]
+                        .to_digit(10)
+                        .unwrap()
+                        < current
+                    {
                         count_right += 1;
                         m += 1;
-                    }
-                    else {
+                    } else {
                         count_right += 1;
-                        break 
+                        break;
                     }
                 }
             } else {
@@ -69,15 +85,18 @@ fn second_part(file: String) -> u32 {
             if left < current {
                 let mut m = 1;
                 while n >= m {
-                    if binding[i].chars().collect::<Vec<char>>()[n-m].to_digit(10).unwrap() < current {
+                    if binding[i].chars().collect::<Vec<char>>()[n - m]
+                        .to_digit(10)
+                        .unwrap()
+                        < current
+                    {
                         count_left += 1;
                         m += 1;
-                    }
-                    else {
+                    } else {
                         count_left += 1;
-                        break 
+                        break;
                     }
-                } 
+                }
             } else {
                 count_left += 1;
             }
@@ -85,113 +104,131 @@ fn second_part(file: String) -> u32 {
             println!("Down: {:?}", count_down);
             println!("Left: {:?}", count_left);
             println!("Right: {:?}", count_right);
-            visibles.push(count_up*count_down*count_right*count_left);
+            visibles.push(count_up * count_down * count_right * count_left);
         }
-    };
+    }
     println!("{:?}", visibles.iter().max().unwrap());
     2
 }
 
 fn first_part(file: String) -> u32 {
- let binding = file.split("\n").collect::<Vec<&str>>();
+    let binding = file.split("\n").collect::<Vec<&str>>();
     let mut visibles = 0;
     for (i, f) in binding.iter().enumerate() {
         for (n, j) in f.chars().collect::<Vec<char>>().iter().enumerate() {
-            if n <= 0 || n >= binding.len()-2 || i <= 0 || i >= binding.len()-2 {
+            if n <= 0 || n >= binding.len() - 2 || i <= 0 || i >= binding.len() - 2 {
                 visibles += 1;
-                continue 
+                continue;
             }
             let current = j.to_digit(10).unwrap();
-            let up = binding[i-1].chars().collect::<Vec<char>>()[n].to_digit(10).unwrap();
-            let down = binding[i+1].chars().collect::<Vec<char>>()[n].to_digit(10).unwrap();
-            let left = binding[i].chars().collect::<Vec<char>>()[n-1].to_digit(10).unwrap();
-            let right = binding[i].chars().collect::<Vec<char>>()[n+1].to_digit(10).unwrap();
-            
+            let up = binding[i - 1].chars().collect::<Vec<char>>()[n]
+                .to_digit(10)
+                .unwrap();
+            let down = binding[i + 1].chars().collect::<Vec<char>>()[n]
+                .to_digit(10)
+                .unwrap();
+            let left = binding[i].chars().collect::<Vec<char>>()[n - 1]
+                .to_digit(10)
+                .unwrap();
+            let right = binding[i].chars().collect::<Vec<char>>()[n + 1]
+                .to_digit(10)
+                .unwrap();
+
             let mut visible_up = false;
-            let mut visible_down = false; 
+            let mut visible_down = false;
             let mut visible_left = false;
             let mut visible_right = false;
-            
+
             if up < current {
                 let mut m = 1;
                 while i >= m {
-                    if binding[i-m].chars().collect::<Vec<char>>()[n].to_digit(10).unwrap() < current {
+                    if binding[i - m].chars().collect::<Vec<char>>()[n]
+                        .to_digit(10)
+                        .unwrap()
+                        < current
+                    {
                         visible_up = true;
                         m += 1;
-                    }
-                    else {
+                    } else {
                         visible_up = false;
-                        break
+                        break;
                     }
                 }
                 if visible_up {
                     visibles += 1;
-                    continue
+                    continue;
                 }
             }
 
             if down < current {
                 let mut m = 1;
-                while m <= (binding.len()-2-i) {
-                    if binding[i+m].chars().collect::<Vec<char>>()[n].to_digit(10).unwrap() < current {
+                while m <= (binding.len() - 2 - i) {
+                    if binding[i + m].chars().collect::<Vec<char>>()[n]
+                        .to_digit(10)
+                        .unwrap()
+                        < current
+                    {
                         visible_down = true;
                         m += 1;
-                    }
-                    else {
+                    } else {
                         visible_down = false;
-                        break 
+                        break;
                     }
                 }
                 if visible_down {
                     visibles += 1;
-                    continue
+                    continue;
                 }
             }
 
             if right < current {
                 let mut m = 1;
-                while (n+m) <= (binding.len()-2) {
-                    if binding[i].chars().collect::<Vec<char>>()[n+m].to_digit(10).unwrap() < current {
+                while (n + m) <= (binding.len() - 2) {
+                    if binding[i].chars().collect::<Vec<char>>()[n + m]
+                        .to_digit(10)
+                        .unwrap()
+                        < current
+                    {
                         visible_right = true;
                         m += 1;
-                    }
-                    else {
+                    } else {
                         visible_right = false;
-                        break 
+                        break;
                     }
                 }
                 if visible_right {
                     visibles += 1;
-                    continue
+                    continue;
                 }
             }
 
             if left < current {
                 let mut m = 1;
                 while n >= m {
-                    if binding[i].chars().collect::<Vec<char>>()[n-m].to_digit(10).unwrap() < current {
+                    if binding[i].chars().collect::<Vec<char>>()[n - m]
+                        .to_digit(10)
+                        .unwrap()
+                        < current
+                    {
                         visible_left = true;
                         m += 1;
-                    }
-                    else {
+                    } else {
                         visible_left = false;
-                        break 
+                        break;
                     }
                 }
                 if visible_left {
                     visibles += 1;
-                    continue
+                    continue;
                 }
             }
         }
-    };
+    }
     visibles
-
 }
 
 fn main() {
-    let file = std::fs::read_to_string("./input")
-        .expect("Couldn't read file");
+    let file = std::fs::read_to_string("./input").expect("Couldn't read file");
 
-       println!("Visibles: {}", second_part(file));
+    println!("Visibles: {}", second_part(file));
 }

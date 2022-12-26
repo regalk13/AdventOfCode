@@ -20,7 +20,7 @@ impl Cave {
     fn draw_line(&mut self, start: (i32, i32), end: (i32, i32)) {
         let dx = (end.0 - start.0).signum();
         let dy = (end.1 - start.1).signum();
-        
+
         self.bottom = self.bottom.max(start.1.max(end.1));
 
         let mut point = start;
@@ -29,12 +29,12 @@ impl Cave {
             point.0 += dx;
             point.1 += dy;
             self.location.insert(point, '#');
-        }       
+        }
     }
-    
+
     fn drop_sand(&mut self) -> bool {
         let mut sand: (i32, i32) = (500, 0);
-        
+
         if self.floor && self.location.contains_key(&sand) {
             return false;
         }
@@ -53,7 +53,7 @@ impl Cave {
         true
     }
 
-    fn fall(&self, pos: (i32, i32)) -> Option<(i32,i32)> {
+    fn fall(&self, pos: (i32, i32)) -> Option<(i32, i32)> {
         for delta_x in [0, -1, 1] {
             let new_pos = (pos.0 + delta_x, pos.1 + 1);
             if !self.location.contains_key(&new_pos) {
@@ -66,7 +66,7 @@ impl Cave {
 
 fn first_part(file: &str) {
     let mut cave = Cave::default();
-    
+
     for line in file.trim().split("\n").collect::<Vec<&str>>() {
         let mut iter = line.split(" -> ");
         let mut start = Cave::convert(iter.next()).unwrap();
@@ -75,19 +75,18 @@ fn first_part(file: &str) {
             start = end;
         }
     }
-   
+
     let mut output = 0;
     while cave.drop_sand() {
         output += 1;
     }
 
     println!("Output: {}", output);
-   
 }
 
 fn second_part(file: &str) {
     let mut cave = Cave::default();
-    cave.floor = true; 
+    cave.floor = true;
     for line in file.trim().split("\n").collect::<Vec<&str>>() {
         let mut iter = line.split(" -> ");
         let mut start = Cave::convert(iter.next()).unwrap();
@@ -96,17 +95,16 @@ fn second_part(file: &str) {
             start = end;
         }
     }
-   
+
     let mut output = 0;
     while cave.drop_sand() {
         output += 1;
     }
 
     println!("Output 2: {}", output);
- 
 }
 fn main() {
     let file = std::fs::read_to_string("./input").expect("Couldn't read input file");
-    first_part(&file);  
-    second_part(&file); 
+    first_part(&file);
+    second_part(&file);
 }

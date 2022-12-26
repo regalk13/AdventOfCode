@@ -47,16 +47,12 @@ fn directory(input: &str) -> IResult<&str, Files> {
 fn ls(input: &str) -> IResult<&str, Operation> {
     let (input, _) = tag("$ ls")(input)?;
     let (input, _) = newline(input)?;
-    let (input, files) = separated_list1(
-        newline,
-        alt((file, directory)),
-    )(input)?;
+    let (input, files) = separated_list1(newline, alt((file, directory)))(input)?;
     Ok((input, Operation::Ls(files)))
 }
 fn cd(input: &str) -> IResult<&str, Operation> {
     let (input, _) = tag("$ cd ")(input)?;
-    let (input, dir) =
-        alt((tag(".."), alpha1, tag("/")))(input)?;
+    let (input, dir) = alt((tag(".."), alpha1, tag("/")))(input)?;
     let op = match dir {
         "/" => Operation::Cd(Cd::Root),
         ".." => Operation::Cd(Cd::Up),
@@ -65,8 +61,7 @@ fn cd(input: &str) -> IResult<&str, Operation> {
     Ok((input, op))
 }
 fn commands(input: &str) -> IResult<&str, Vec<Operation>> {
-    let (input, cmd) =
-        separated_list1(newline, alt((ls, cd)))(input)?;
+    let (input, cmd) = separated_list1(newline, alt((ls, cd)))(input)?;
 
     Ok((input, cmd))
 }
@@ -78,8 +73,7 @@ struct File<'a> {
 }
 pub fn process_part1(input: &str) -> String {
     let cmds = commands(input).unwrap().1;
-    let mut directories: BTreeMap<String, Vec<File>> =
-        BTreeMap::new();
+    let mut directories: BTreeMap<String, Vec<File>> = BTreeMap::new();
     let mut context: Vec<&str> = vec![];
 
     for command in cmds.iter() {
@@ -95,31 +89,15 @@ pub fn process_part1(input: &str) -> String {
             }
             Operation::Ls(files) => {
                 directories
-                    .entry(
-                        context
-                            .iter()
-                            .cloned()
-                            .intersperse("/")
-                            .collect::<String>(),
-                    )
+                    .entry(context.iter().cloned().intersperse("/").collect::<String>())
                     .or_insert(vec![]);
                 for file in files.iter() {
                     match file {
                         Files::File { size, name } => {
                             directories
-                                .entry(
-                                    context
-                                        .iter()
-                                        .cloned()
-                                        .intersperse("/")
-                                        .collect::<String>(
-                                        ),
-                                )
+                                .entry(context.iter().cloned().intersperse("/").collect::<String>())
                                 .and_modify(|vec| {
-                                    vec.push(File {
-                                        size: *size,
-                                        name,
-                                    });
+                                    vec.push(File { size: *size, name });
                                 });
                         }
                         Files::Dir(_) => (),
@@ -132,10 +110,7 @@ pub fn process_part1(input: &str) -> String {
     let mut sizes: BTreeMap<String, u32> = BTreeMap::new();
     for (path, files) in directories.iter() {
         let dirs = path.split("/").collect::<Vec<&str>>();
-        let size = files
-            .iter()
-            .map(|File { size, .. }| size)
-            .sum::<u32>();
+        let size = files.iter().map(|File { size, .. }| size).sum::<u32>();
         for i in 0..dirs.len() {
             sizes
                 .entry(
@@ -159,8 +134,7 @@ pub fn process_part1(input: &str) -> String {
 
 pub fn process_part2(input: &str) -> String {
     let cmds = commands(input).unwrap().1;
-    let mut directories: BTreeMap<String, Vec<File>> =
-        BTreeMap::new();
+    let mut directories: BTreeMap<String, Vec<File>> = BTreeMap::new();
     let mut context: Vec<&str> = vec![];
 
     for command in cmds.iter() {
@@ -176,31 +150,15 @@ pub fn process_part2(input: &str) -> String {
             }
             Operation::Ls(files) => {
                 directories
-                    .entry(
-                        context
-                            .iter()
-                            .cloned()
-                            .intersperse("/")
-                            .collect::<String>(),
-                    )
+                    .entry(context.iter().cloned().intersperse("/").collect::<String>())
                     .or_insert(vec![]);
                 for file in files.iter() {
                     match file {
                         Files::File { size, name } => {
                             directories
-                                .entry(
-                                    context
-                                        .iter()
-                                        .cloned()
-                                        .intersperse("/")
-                                        .collect::<String>(
-                                        ),
-                                )
+                                .entry(context.iter().cloned().intersperse("/").collect::<String>())
                                 .and_modify(|vec| {
-                                    vec.push(File {
-                                        size: *size,
-                                        name,
-                                    });
+                                    vec.push(File { size: *size, name });
                                 });
                         }
                         Files::Dir(_) => (),
@@ -213,10 +171,7 @@ pub fn process_part2(input: &str) -> String {
     let mut sizes: BTreeMap<String, u32> = BTreeMap::new();
     for (path, files) in directories.iter() {
         let dirs = path.split("/").collect::<Vec<&str>>();
-        let size = files
-            .iter()
-            .map(|File { size, .. }| size)
-            .sum::<u32>();
+        let size = files.iter().map(|File { size, .. }| size).sum::<u32>();
         for i in 0..dirs.len() {
             sizes
                 .entry(
@@ -237,8 +192,7 @@ pub fn process_part2(input: &str) -> String {
     let used_space = sizes.get("").unwrap();
 
     let current_free_space = total_size - used_space;
-    let need_to_free_at_least =
-        needed_space - current_free_space;
+    let need_to_free_at_least = needed_space - current_free_space;
 
     let mut valid_dirs = sizes
         .iter()
@@ -252,10 +206,8 @@ pub fn process_part2(input: &str) -> String {
 
 fn main() {
     let file = std::fs::read_to_string("./input").expect("Couldn't read file");
-    
+
     println!("{:?}", process_part1(&file));
 
     println!("{:?}", process_part2(&file));
 }
-
-

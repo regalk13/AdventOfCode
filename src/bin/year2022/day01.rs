@@ -1,25 +1,35 @@
-pub fn main() {
-    let file = advent_of_code::read_file("2022".to_string(), "01".to_string());
+use crate::Runit;
 
-    let mut i = 0;
-    let mut vector: Vec<u32> = Vec::new();
+#[derive(Default)]
+pub struct AocDay01 {
+    output: Vec<u32>,
+}
+impl AocDay01 {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
 
-    for l in file.split("\n") {
-        if l.is_empty() {
-            vector.push(0);
-            i += 1;
-            continue;
-        }
-        let l: u32 = l.trim().parse().expect("Expected a number");
-        if vector.len() <= 0 {
-            vector.push(l);
-        }
-        vector[i] = vector[i] + l;
+impl Runit for AocDay01 {
+    fn parse(&mut self) {
+        let file = advent_of_code::read_file("2022".to_string(), "01".to_string());
+        self.output = file
+            .trim()
+            .split("\n\n")
+            .map(|line| {
+                line.split("\n")
+                    .map(|l| l.parse::<u32>().unwrap())
+                    .sum::<u32>()
+            })
+            .collect::<Vec<u32>>();
     }
 
-    vector.sort_by(|a, b| b.cmp(a));
+    fn first_part(&mut self) -> String {
+        self.output.iter().max().unwrap().to_string()
+    }
 
-    println!("{}", vector[0]);
-    // Part 2
-    println!("The sum of top three is: {}", vector.iter().take(3).sum::<u32>());
+    fn second_part(&mut self) -> String {
+        self.output.sort_by(|a, b| b.cmp(a));
+        self.output.iter().take(3).sum::<u32>().to_string()
+    }
 }

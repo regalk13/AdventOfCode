@@ -13,7 +13,7 @@ fn snafu_decimal(number: &str) -> i64 {
         }
         place *= 5;
     }
-    
+
     result
 }
 
@@ -26,7 +26,7 @@ fn decimal_snafu(mut number: i64) -> String {
             total += &rem.to_string();
         } else {
             let remer = "   =-".chars().collect::<Vec<char>>();
-            total += &remer[rem as usize].to_string(); 
+            total += &remer[rem as usize].to_string();
             number += 1;
         }
     }
@@ -42,6 +42,6 @@ fn first_part(file: &str) {
 
 fn main() {
     let file = std::fs::read_to_string("./input").expect("Couldn't read input file");
-    
+
     first_part(&file);
 }

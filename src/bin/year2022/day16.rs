@@ -117,7 +117,7 @@ fn compress<'a>(valves: &'a [Valve]) -> HashMap<&'a str, CompressedValve<'a>> {
 // Start point
 const START: &str = "AA";
 
-// Id values 
+// Id values
 struct IdValve {
     name: usize,
     flow: i64,
@@ -260,7 +260,7 @@ impl BitSet {
     }
 }
 
-// Second Part: 
+// Second Part:
 // State of the elephant
 #[derive(Clone, PartialEq, Eq, Hash)]
 struct StateWithElephant {
@@ -374,7 +374,6 @@ fn one_actor_cost(
     cost
 }
 
-
 // Part one function
 fn part_one(valves: &HashMap<usize, IdValve>, start: usize) -> i64 {
     let mut sorted_by_flow: Vec<(usize, i64)> = valves.values().map(|v| (v.name, v.flow)).collect();
@@ -400,10 +399,10 @@ fn part_two(valves: &HashMap<usize, IdValve>, start: usize) -> i64 {
 
     -cost
 }
-    
-// main function 
+
+// main function
 fn main() {
-         const INPUT: &str = "Valve AA has flow rate=0; tunnels lead to valves DD, II, BB
+    const INPUT: &str = "Valve AA has flow rate=0; tunnels lead to valves DD, II, BB
 Valve BB has flow rate=13; tunnels lead to valves CC, AA
 Valve CC has flow rate=2; tunnels lead to valves DD, BB
 Valve DD has flow rate=20; tunnels lead to valves CC, AA, EE
@@ -413,10 +412,10 @@ Valve GG has flow rate=0; tunnels lead to valves FF, HH
 Valve HH has flow rate=22; tunnel leads to valve GG
 Valve II has flow rate=0; tunnels lead to valves AA, JJ
 Valve JJ has flow rate=21; tunnel leads to valve II";
-        let valves = parse(INPUT);
-        let compressed = compress(&valves);
-        let (ids, start) = identifiers(&compressed);
-        
-        println!("{:?}", part_one(&ids, start));  
-        println!("{:?}", part_two(&ids, start));
-} 
+    let valves = parse(INPUT);
+    let compressed = compress(&valves);
+    let (ids, start) = identifiers(&compressed);
+
+    println!("{:?}", part_one(&ids, start));
+    println!("{:?}", part_two(&ids, start));
+}

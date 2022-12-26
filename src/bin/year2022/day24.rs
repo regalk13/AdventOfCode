@@ -29,7 +29,7 @@ struct Cell {
     w: Bitmask,
 }
 
-// Position and define walls 
+// Position and define walls
 impl Cell {
     fn wall() -> Cell {
         Cell {

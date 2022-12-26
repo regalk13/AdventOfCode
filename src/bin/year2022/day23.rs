@@ -21,7 +21,7 @@ impl Elves {
                 }
             }
         }
-        // Returning a new Elves 
+        // Returning a new Elves
         Elves {
             elves: elves,
             count: 1,
@@ -44,7 +44,7 @@ impl Elves {
         );
         hash
     }
-    
+
     // Move the elft in a loop until find the last possible position
     fn move_elves_part2(&mut self) {
         // Creathe i <- sqrt(-1)
@@ -66,7 +66,7 @@ impl Elves {
         // The las map is the current map until it changes
         let mut last_map = self.elves.clone();
         loop {
-            // Position considered just one time 
+            // Position considered just one time
             let mut once = HashSet::new();
             // Position considered two times
             let mut twice = HashSet::new();
@@ -206,7 +206,7 @@ fn first_part(file: &str) -> i32 {
     elves_info.move_elves();
     // using the complex numbers: x - real part, y - imaginary part
     // Min value of x, max value of x, min value of y and max value of y
-    // this gives you the size of the rectangle where the elves are 
+    // this gives you the size of the rectangle where the elves are
     let minx = elves_info.elves.iter().map(|x| x.re).min();
     let maxx = elves_info.elves.iter().map(|x| x.re).max();
     let miny = elves_info.elves.iter().map(|x| x.im).min();

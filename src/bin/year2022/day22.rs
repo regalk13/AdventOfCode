@@ -111,116 +111,104 @@ impl Instruction {
         new_cursor.pos.0 += cursor.dir.0;
         new_cursor.pos.1 += cursor.dir.1;
         match current_face {
-            1 => {
-                match cursor.dir {
-                    (0, 1) => {}
-                    (1, 0) => {}
-                    (0, -1) => {
-                        new_cursor.dir = (0, 1);
-                        new_cursor.pos.0 = FACE_SIZE * 3 - cursor.pos.0 - 1;
-                        new_cursor.pos.1 = 0;
-                    }
-                    (-1, 0) => {
-                        new_cursor.dir = (0, 1);
-                        new_cursor.pos.0 = cursor.pos.1 + FACE_SIZE * 2;
-                        new_cursor.pos.1 = 0;
-                    }
-                    _ => panic!("Unexpected direction: {:?}", cursor.dir),
+            1 => match cursor.dir {
+                (0, 1) => {}
+                (1, 0) => {}
+                (0, -1) => {
+                    new_cursor.dir = (0, 1);
+                    new_cursor.pos.0 = FACE_SIZE * 3 - cursor.pos.0 - 1;
+                    new_cursor.pos.1 = 0;
                 }
-            }
-            2 => {
-                match cursor.dir {
-                    (0, 1) => {
-                        new_cursor.dir = (0, -1);
-                        new_cursor.pos.0 = FACE_SIZE * 3 - cursor.pos.0 - 1;
-                        new_cursor.pos.1 = cursor.pos.1 - FACE_SIZE;
-                    }
-                    (1, 0) => {
-                        new_cursor.dir = (0, -1);
-                        new_cursor.pos.0 = cursor.pos.1 - FACE_SIZE;
-                        new_cursor.pos.1 = FACE_SIZE * 2 - 1;
-                    }
-                    (0, -1) => {}
-                    (-1, 0) => {
-                        new_cursor.dir = (-1, 0);
-                        new_cursor.pos.0 = FACE_SIZE * 4 - 1;
-                        new_cursor.pos.1 = cursor.pos.1 - FACE_SIZE * 2;
-                    }
-                    _ => panic!("Unexpected direction: {:?}", cursor.dir),
+                (-1, 0) => {
+                    new_cursor.dir = (0, 1);
+                    new_cursor.pos.0 = cursor.pos.1 + FACE_SIZE * 2;
+                    new_cursor.pos.1 = 0;
                 }
-            }
-            3 => {
-                match cursor.dir {
-                    (0, 1) => {
-                        new_cursor.dir = (-1, 0);
-                        new_cursor.pos.0 = FACE_SIZE - 1;
-                        new_cursor.pos.1 = cursor.pos.0 + FACE_SIZE;
-                    }
-                    (1, 0) => {}
-                    (0, -1) => {
-                        new_cursor.dir = (1, 0);
-                        new_cursor.pos.0 = FACE_SIZE * 2;
-                        new_cursor.pos.1 = cursor.pos.0 - FACE_SIZE;
-                    }
-                    (-1, 0) => {}
-                    _ => panic!("Unexpected direction: {:?}", cursor.dir),
+                _ => panic!("Unexpected direction: {:?}", cursor.dir),
+            },
+            2 => match cursor.dir {
+                (0, 1) => {
+                    new_cursor.dir = (0, -1);
+                    new_cursor.pos.0 = FACE_SIZE * 3 - cursor.pos.0 - 1;
+                    new_cursor.pos.1 = cursor.pos.1 - FACE_SIZE;
                 }
-            }
-            4 => {
-                match cursor.dir {
-                    (0, 1) => {}
-                    (1, 0) => {}
-                    (0, -1) => {
-                        new_cursor.dir = (0, 1);
-                        new_cursor.pos.0 = 3 * FACE_SIZE - cursor.pos.0 - 1;
-                        new_cursor.pos.1 = FACE_SIZE;
-                    }
-                    (-1, 0) => {
-                        new_cursor.dir = (0, 1);
-                        new_cursor.pos.0 = cursor.pos.1 + FACE_SIZE;
-                        new_cursor.pos.1 = FACE_SIZE;
-                    }
-                    _ => panic!("Unexpected direction: {:?}", cursor.dir),
+                (1, 0) => {
+                    new_cursor.dir = (0, -1);
+                    new_cursor.pos.0 = cursor.pos.1 - FACE_SIZE;
+                    new_cursor.pos.1 = FACE_SIZE * 2 - 1;
                 }
-            }
-            5 => {
-                match cursor.dir {
-                    (0, 1) => {
-                        new_cursor.dir = (0, -1);
-                        new_cursor.pos.0 = 3 * FACE_SIZE - cursor.pos.0 - 1;
-                        new_cursor.pos.1 = FACE_SIZE * 3 - 1;
-                    }
-                    (1, 0) => {
-                        new_cursor.dir = (0, -1);
-                        new_cursor.pos.0 = cursor.pos.1 + FACE_SIZE * 2;
-                        new_cursor.pos.1 = FACE_SIZE - 1;
-                    }
-                    (0, -1) => {}
-                    (-1, 0) => {}
-                    _ => panic!("Unexpected direction: {:?}", cursor.dir),
+                (0, -1) => {}
+                (-1, 0) => {
+                    new_cursor.dir = (-1, 0);
+                    new_cursor.pos.0 = FACE_SIZE * 4 - 1;
+                    new_cursor.pos.1 = cursor.pos.1 - FACE_SIZE * 2;
                 }
-            }
-            6 => {
-                match cursor.dir {
-                    (0, 1) => {
-                        new_cursor.dir = (-1, 0);
-                        new_cursor.pos.0 = FACE_SIZE * 3 - 1;
-                        new_cursor.pos.1 = cursor.pos.0 - 2 * FACE_SIZE;
-                    }
-                    (1, 0) => {
-                        new_cursor.dir = (1, 0);
-                        new_cursor.pos.0 = 0;
-                        new_cursor.pos.1 = cursor.pos.1 + FACE_SIZE * 2;
-                    }
-                    (0, -1) => {
-                        new_cursor.dir = (1, 0);
-                        new_cursor.pos.0 = 0;
-                        new_cursor.pos.1 = cursor.pos.0 - FACE_SIZE * 2;
-                    }
-                    (-1, 0) => {}
-                    _ => panic!("Unexpected direction: {:?}", cursor.dir),
+                _ => panic!("Unexpected direction: {:?}", cursor.dir),
+            },
+            3 => match cursor.dir {
+                (0, 1) => {
+                    new_cursor.dir = (-1, 0);
+                    new_cursor.pos.0 = FACE_SIZE - 1;
+                    new_cursor.pos.1 = cursor.pos.0 + FACE_SIZE;
                 }
-            }
+                (1, 0) => {}
+                (0, -1) => {
+                    new_cursor.dir = (1, 0);
+                    new_cursor.pos.0 = FACE_SIZE * 2;
+                    new_cursor.pos.1 = cursor.pos.0 - FACE_SIZE;
+                }
+                (-1, 0) => {}
+                _ => panic!("Unexpected direction: {:?}", cursor.dir),
+            },
+            4 => match cursor.dir {
+                (0, 1) => {}
+                (1, 0) => {}
+                (0, -1) => {
+                    new_cursor.dir = (0, 1);
+                    new_cursor.pos.0 = 3 * FACE_SIZE - cursor.pos.0 - 1;
+                    new_cursor.pos.1 = FACE_SIZE;
+                }
+                (-1, 0) => {
+                    new_cursor.dir = (0, 1);
+                    new_cursor.pos.0 = cursor.pos.1 + FACE_SIZE;
+                    new_cursor.pos.1 = FACE_SIZE;
+                }
+                _ => panic!("Unexpected direction: {:?}", cursor.dir),
+            },
+            5 => match cursor.dir {
+                (0, 1) => {
+                    new_cursor.dir = (0, -1);
+                    new_cursor.pos.0 = 3 * FACE_SIZE - cursor.pos.0 - 1;
+                    new_cursor.pos.1 = FACE_SIZE * 3 - 1;
+                }
+                (1, 0) => {
+                    new_cursor.dir = (0, -1);
+                    new_cursor.pos.0 = cursor.pos.1 + FACE_SIZE * 2;
+                    new_cursor.pos.1 = FACE_SIZE - 1;
+                }
+                (0, -1) => {}
+                (-1, 0) => {}
+                _ => panic!("Unexpected direction: {:?}", cursor.dir),
+            },
+            6 => match cursor.dir {
+                (0, 1) => {
+                    new_cursor.dir = (-1, 0);
+                    new_cursor.pos.0 = FACE_SIZE * 3 - 1;
+                    new_cursor.pos.1 = cursor.pos.0 - 2 * FACE_SIZE;
+                }
+                (1, 0) => {
+                    new_cursor.dir = (1, 0);
+                    new_cursor.pos.0 = 0;
+                    new_cursor.pos.1 = cursor.pos.1 + FACE_SIZE * 2;
+                }
+                (0, -1) => {
+                    new_cursor.dir = (1, 0);
+                    new_cursor.pos.0 = 0;
+                    new_cursor.pos.1 = cursor.pos.0 - FACE_SIZE * 2;
+                }
+                (-1, 0) => {}
+                _ => panic!("Unexpected direction: {:?}", cursor.dir),
+            },
             _ => panic!("Unexpected face: {}", current_face),
         }
 
@@ -347,7 +335,7 @@ fn first_part(file_lines: &[String]) -> i64 {
         cursor = instruction.execute(&cursor, &parsed.tiles, true);
     }
     let password = cursor.password();
-    
+
     password
 }
 

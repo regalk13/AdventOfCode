@@ -1,4 +1,4 @@
-mod day01;
+pub mod day01;
 mod day02;
 mod day03;
 mod day04;
@@ -24,7 +24,7 @@ mod day23;
 mod day24;
 mod day25;
 
-use day01::*;
+pub use day01::*;
 use day02::*;
 use day03::*;
 use day04::*;
@@ -50,8 +50,6 @@ use day23::*;
 use day24::*;
 use day25::*;
 
-
 pub fn run() {
     println!("Running");
-    day01::main();
 }
