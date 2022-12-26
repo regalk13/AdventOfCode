@@ -1,5 +1,5 @@
-fn main() {
-    let file = std::fs::read_to_string("./input")
+pub fn main() {
+    let file = std::fs::read_to_string("./input/2022/input_day01")
         .expect("Invalid input");
 
     let mut i = 0;
