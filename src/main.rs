@@ -11,6 +11,11 @@ pub trait Runit {
     fn second_part(&mut self) -> String;
 }
 
+pub fn read_file(year: String, day: String) -> String {
+    let template = format!("input/{}/input_day{}", year, day);
+    std::fs::read_to_string(template).expect("Couldn't read file")
+}
+
 fn main() {
     let args = std::env::args().collect::<Vec<String>>();
 

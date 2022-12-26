@@ -12,7 +12,7 @@ impl AocDay01 {
 
 impl Runit for AocDay01 {
     fn parse(&mut self) {
-        let file = advent_of_code::read_file("2022".to_string(), "01".to_string());
+        let file = crate::read_file("2022".to_string(), "01".to_string());
         self.output = file
             .trim()
             .split("\n\n")
