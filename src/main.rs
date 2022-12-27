@@ -5,6 +5,11 @@ mod aoc2022;
 
 use aoc2022::*;
 
+struct Day {
+    year: i32,
+    day: i32,
+}
+
 pub trait Runit {
     fn parse(&mut self);
     fn first_part(&mut self) -> String;
@@ -26,10 +31,10 @@ fn main() {
     }
 
     let years = vec![run_2022];
-    
     if let Ok(year) = args[1].parse::<u32>() {
         if (2015..=2022).contains(&year) {
             if let Ok(day_) = args[2].parse::<u32>() {
+                println!("Running day {}, from {}", day_, year);
                 years[year as usize - 2022](day_)
             } else {
                 println!("Invalid day: {:?}", args[2])
@@ -40,7 +45,6 @@ fn main() {
     } else {
         println!("Invalid year, valid format example: 2022");
     }
-
 }
 
 pub fn run<T: Runit + ?Sized>(day: &mut T) {

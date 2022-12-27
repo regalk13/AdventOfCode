@@ -1,4 +1,16 @@
+use crate::Runit;
 use std::{cmp::Ordering, str::FromStr};
+
+#[derive(Default)]
+pub struct AocDay02 {
+    input: String,
+}
+
+impl AocDay02 {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
 
 #[derive(PartialEq, Copy, Clone)]
 enum Options {
@@ -30,62 +42,64 @@ impl PartialOrd for Options {
     }
 }
 
-fn second_point(file: &str) {
-    let result: u32 = file
-        .lines()
-        .map(|line| {
-            let moves: Vec<&str> = line.split(" ").collect();
-            let opponent_move = moves[0].parse::<Options>().unwrap();
-            match moves[1] {
-                "X" => {
-                    let rmove = match opponent_move {
-                        Options::Rock => Options::Scissors,
-                        Options::Paper => Options::Rock,
-                        Options::Scissors => Options::Paper,
-                    };
-                    0 + rmove as u32
+impl Runit for AocDay02 {
+    fn parse(&mut self) {
+        self.input = crate::read_file("2022".to_string(), "02".to_string());
+    }
+    fn first_part(&mut self) -> String {
+        let result: u32 = self
+            .input
+            .lines()
+            .map(|line| {
+                let moves: Vec<Options> = line
+                    .split(" ")
+                    .map(|s| s.parse::<Options>().unwrap())
+                    .collect();
+                match moves[0].partial_cmp(&moves[1]) {
+                    Some(Ordering::Equal) => 3 + moves[1] as u32,
+                    Some(Ordering::Less) => 6 + moves[1] as u32,
+                    Some(Ordering::Greater) => 0 + moves[1] as u32,
+                    None => {
+                        panic!("moves should be comparable")
+                    }
                 }
-                "Y" => 3 + opponent_move as u32,
-                "Z" => {
-                    let rmove = match opponent_move {
-                        Options::Rock => Options::Paper,
-                        Options::Paper => Options::Scissors,
-                        Options::Scissors => Options::Rock,
-                    };
-                    6 + rmove as u32
+            })
+            .sum();
+
+        result.to_string()
+    }
+
+    fn second_part(&mut self) -> String {
+        let result: u32 = self
+            .input
+            .lines()
+            .map(|line| {
+                let moves: Vec<&str> = line.split(" ").collect();
+                let opponent_move = moves[0].parse::<Options>().unwrap();
+                match moves[1] {
+                    "X" => {
+                        let rmove = match opponent_move {
+                            Options::Rock => Options::Scissors,
+                            Options::Paper => Options::Rock,
+                            Options::Scissors => Options::Paper,
+                        };
+                        0 + rmove as u32
+                    }
+                    "Y" => 3 + opponent_move as u32,
+                    "Z" => {
+                        let rmove = match opponent_move {
+                            Options::Rock => Options::Paper,
+                            Options::Paper => Options::Scissors,
+                            Options::Scissors => Options::Rock,
+                        };
+                        6 + rmove as u32
+                    }
+                    _ => {
+                        panic!("moves should be comparable")
+                    }
                 }
-                _ => {
-                    panic!("moves should be comparable")
-                }
-            }
-        })
-        .sum();
-
-    println!("{}", result);
-}
-
-fn main() {
-    let file = std::fs::read_to_string("./input").unwrap();
-
-    second_point(&file);
-
-    let result: u32 = file
-        .lines()
-        .map(|line| {
-            let moves: Vec<Options> = line
-                .split(" ")
-                .map(|s| s.parse::<Options>().unwrap())
-                .collect();
-            match moves[0].partial_cmp(&moves[1]) {
-                Some(Ordering::Equal) => 3 + moves[1] as u32,
-                Some(Ordering::Less) => 6 + moves[1] as u32,
-                Some(Ordering::Greater) => 0 + moves[1] as u32,
-                None => {
-                    panic!("moves should be comparable")
-                }
-            }
-        })
-        .sum();
-
-    println!("{}", result);
+            })
+            .sum();
+        result.to_string()
+    }
 }

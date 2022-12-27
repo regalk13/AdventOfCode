@@ -1,3 +1,4 @@
+use crate::Runit;
 mod day01;
 mod day02;
 mod day03;
@@ -25,7 +26,10 @@ mod day24;
 mod day25;
 
 pub fn run_2022(day: u32) {
-   let day01 = day01::AocDay01::new(); 
-   let mut days = vec![day01];
-   crate::run(&mut days[day as usize -1]);
+    let mut day01 = day01::AocDay01::new();
+    let mut day02 = day02::AocDay02::new();
+    let mut day03 = day03::AocDay03::new();
+    let mut day04 = day04::AocDay04::new();
+    let mut days: Vec<&mut dyn Runit> = vec![&mut day01, &mut day02, &mut day03, &mut day04];
+    crate::run(days[day as usize - 1]);
 }
