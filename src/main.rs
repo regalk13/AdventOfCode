@@ -5,11 +5,6 @@ mod aoc2022;
 
 use aoc2022::*;
 
-struct Day {
-    year: i32,
-    day: i32,
-}
-
 pub trait Runit {
     fn parse(&mut self);
     fn first_part(&mut self) -> String;

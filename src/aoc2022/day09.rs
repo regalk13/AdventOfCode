@@ -1,5 +1,18 @@
+use crate::Runit;
 use std::collections::HashSet;
 use std::str::FromStr;
+
+#[derive(Default)]
+pub struct AocDay09 {
+    moves: Vec<String>,
+}
+
+impl AocDay09 {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
 
 #[derive(Debug, Clone)]
 enum Moves {
@@ -86,73 +99,71 @@ fn move_second(dx: i32, dy: i32, mut knots: Vec<(i32, i32)>) -> Vec<(i32, i32)> 
     knots
 }
 
-fn second_part(file: String) -> u32 {
-    let moves = file.trim().split("\n").collect::<Vec<&str>>();
-
-    let mut knots = (0..10).map(|c| (c, c)).collect::<Vec<_>>();
-
-    let mut tail_visited = HashSet::new();
-    tail_visited.insert(knots[knots.len() - 1]);
-
-    for line in moves {
-        let (op, amount) = line.split_once(" ").unwrap();
-
-        let range_amount = amount.parse::<i32>().unwrap();
-        let ds = op.parse::<Moves>().unwrap();
-
-        let ds_moves = match ds {
-            Moves::Up => [0, 1],
-            Moves::Down => [0, -1],
-            Moves::Left => [-1, 0],
-            Moves::Right => [1, 0],
-        };
-
-        for _ in 1..range_amount {
-            let dx = ds_moves[0];
-            let dy = ds_moves[1];
-            knots = move_second(dx, dy, knots);
-            tail_visited.insert(knots[knots.len() - 1]);
-        }
+impl Runit for AocDay09 {
+    fn parse(&mut self) {
+        let file = crate::read_file("2022".to_string(), "09".to_string());
+        self.moves = file.trim().split("\n").map(|l| l.to_string()).collect::<Vec<String>>();
     }
-    tail_visited.len() as u32
-}
-fn first_part(file: String) -> u32 {
-    let moves = file.trim().split("\n").collect::<Vec<&str>>();
+    fn second_part(&mut self) -> String {
 
-    let mut hx = 0;
-    let mut hy = 0;
-    let mut tx = 0;
-    let mut ty = 0;
+        let mut knots = (0..10).map(|c| (c, c)).collect::<Vec<_>>();
 
-    let mut tail_visited = HashSet::new();
-    tail_visited.insert((tx, ty));
+        let mut tail_visited = HashSet::new();
+        tail_visited.insert(knots[knots.len() - 1]);
 
-    for line in moves {
-        let (op, amount) = line.split_once(" ").unwrap();
+        for line in &self.moves {
+            let (op, amount) = line.split_once(" ").unwrap();
 
-        let range_amount = amount.parse::<i32>().unwrap();
-        let ds = op.parse::<Moves>().unwrap();
-        let ds_moves = match ds {
-            Moves::Up => [0, 1],
-            Moves::Down => [0, -1],
-            Moves::Left => [-1, 0],
-            Moves::Right => [1, 0],
-        };
+            let range_amount = amount.parse::<i32>().unwrap();
+            let ds = op.parse::<Moves>().unwrap();
 
-        for _ in 0..range_amount {
-            hx += ds_moves[0];
-            hy += ds_moves[1];
-            let moves_made = move_it(hx, hy, tx, ty);
-            tx += moves_made.0;
-            ty += moves_made.1;
-            tail_visited.insert((tx, ty));
+            let ds_moves = match ds {
+                Moves::Up => [0, 1],
+                Moves::Down => [0, -1],
+                Moves::Left => [-1, 0],
+                Moves::Right => [1, 0],
+            };
+
+            for _ in 1..range_amount {
+                let dx = ds_moves[0];
+                let dy = ds_moves[1];
+                knots = move_second(dx, dy, knots);
+                tail_visited.insert(knots[knots.len() - 1]);
+            }
         }
+        tail_visited.len().to_string()
     }
-    tail_visited.len() as u32
-}
+    fn first_part(&mut self) -> String {
 
-fn main() {
-    let file = std::fs::read_to_string("./input.test").expect("Couldn't read input file");
+        let mut hx = 0;
+        let mut hy = 0;
+        let mut tx = 0;
+        let mut ty = 0;
 
-    println!("Result: {:?}", second_part(file));
+        let mut tail_visited = HashSet::new();
+        tail_visited.insert((tx, ty));
+
+        for line in &self.moves {
+            let (op, amount) = line.split_once(" ").unwrap();
+
+            let range_amount = amount.parse::<i32>().unwrap();
+            let ds = op.parse::<Moves>().unwrap();
+            let ds_moves = match ds {
+                Moves::Up => [0, 1],
+                Moves::Down => [0, -1],
+                Moves::Left => [-1, 0],
+                Moves::Right => [1, 0],
+            };
+
+            for _ in 0..range_amount {
+                hx += ds_moves[0];
+                hy += ds_moves[1];
+                let moves_made = move_it(hx, hy, tx, ty);
+                tx += moves_made.0;
+                ty += moves_made.1;
+                tail_visited.insert((tx, ty));
+            }
+        }
+        tail_visited.len().to_string()
+    }
 }
