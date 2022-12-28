@@ -1,6 +1,6 @@
 #![feature(iter_array_chunks)]
 #![feature(iter_intersperse)]
-
+use std::time::{Duration, Instant};
 mod aoc2022;
 
 use aoc2022::*;
@@ -43,8 +43,35 @@ fn main() {
 }
 
 pub fn run<T: Runit + ?Sized>(day: &mut T) {
+    let start = Instant::now();
     day.parse();
+    let parse_time = start.elapsed().as_millis();
+    println!(
+        "Time parsing: {:3}.{:03}",
+        parse_time / 1000,
+        parse_time % 1000
+    );
+    println!();
+    println!("Part 1");
+    let start = Instant::now();
+    let part_1 = day.first_part();
+    let part1_time = start.elapsed().as_millis();
+    println!(
+        "Time running: {:3}.{:03}",
+        part1_time / 1000,
+        part1_time % 1000
+    );
+    println!("Result: {}", part_1);
 
-    println!("Part 1 \n{}", day.first_part());
-    println!("Part 2 \n{}", day.second_part());
+    println!();
+    println!("Part 2");
+    let start = Instant::now();
+    let part_2 = day.first_part();
+    let part2_time = start.elapsed().as_millis();
+    println!(
+        "Time running: {:3}.{:03}",
+        part2_time / 1000,
+        part2_time % 1000
+    );
+    println!("Result: {}", part_2);
 }
