@@ -1,3 +1,5 @@
+use crate::Runit;
+
 use std::{
     collections::{hash_map::Entry, HashMap},
     hash::Hash,
@@ -13,6 +15,18 @@ use nom::{
     IResult,
 };
 use pathfinding::prelude::{astar, dijkstra_all};
+
+#[derive(Default)]
+pub struct AocDay16 {
+    ids: HashMap<usize, IdValve>,
+    start: usize,
+}
+
+impl AocDay16 {
+    pub fn new() -> Self {
+        AocDay16::default()
+    }
+}
 
 // Valve Struct
 #[derive(Debug)]
@@ -374,35 +388,10 @@ fn one_actor_cost(
     cost
 }
 
-// Part one function
-fn part_one(valves: &HashMap<usize, IdValve>, start: usize) -> i64 {
-    let mut sorted_by_flow: Vec<(usize, i64)> = valves.values().map(|v| (v.name, v.flow)).collect();
-    sorted_by_flow.sort_by_key(|(_, f)| *f);
-    sorted_by_flow.reverse();
-
-    -one_actor_cost(&State::new(valves, start), valves, &sorted_by_flow)
-}
-
-// Second part function
-fn part_two(valves: &HashMap<usize, IdValve>, start: usize) -> i64 {
-    let mut sorted_by_flow: Vec<(usize, i64)> = valves.values().map(|v| (v.name, v.flow)).collect();
-    sorted_by_flow.sort_by_key(|(_, f)| *f);
-    sorted_by_flow.reverse();
-
-    let (_, cost) = astar(
-        &StateWithElephant::new(valves, start),
-        |state| state.moves(valves),
-        |state| state.heuristic(&sorted_by_flow, valves),
-        |state| state.finished(valves),
-    )
-    .unwrap();
-
-    -cost
-}
-
-// main function
-fn main() {
-    const INPUT: &str = "Valve AA has flow rate=0; tunnels lead to valves DD, II, BB
+impl Runit for AocDay16 {
+    // main function
+    fn parse(&mut self) {
+        const INPUT: &str = "Valve AA has flow rate=0; tunnels lead to valves DD, II, BB
 Valve BB has flow rate=13; tunnels lead to valves CC, AA
 Valve CC has flow rate=2; tunnels lead to valves DD, BB
 Valve DD has flow rate=20; tunnels lead to valves CC, AA, EE
@@ -412,10 +401,42 @@ Valve GG has flow rate=0; tunnels lead to valves FF, HH
 Valve HH has flow rate=22; tunnel leads to valve GG
 Valve II has flow rate=0; tunnels lead to valves AA, JJ
 Valve JJ has flow rate=21; tunnel leads to valve II";
-    let valves = parse(INPUT);
-    let compressed = compress(&valves);
-    let (ids, start) = identifiers(&compressed);
+        let valves = parse(INPUT);
+        let compressed = compress(&valves);
+        let (ids, start) = identifiers(&compressed);
+        self.ids = ids;
+        self.start = start;
+    }
+    // Part one function
+    fn first_part(&mut self) -> String {
+        let valves = &self.ids;
+        let start = self.start;
+        let mut sorted_by_flow: Vec<(usize, i64)> =
+            valves.values().map(|v| (v.name, v.flow)).collect();
+        sorted_by_flow.sort_by_key(|(_, f)| *f);
+        sorted_by_flow.reverse();
 
-    println!("{:?}", part_one(&ids, start));
-    println!("{:?}", part_two(&ids, start));
+        (-one_actor_cost(&State::new(&valves, start), &valves, &sorted_by_flow)).to_string()
+    }
+
+    // Second part function
+    fn second_part(&mut self) -> String {
+        let valves = &self.ids;
+        let start = self.start;
+
+        let mut sorted_by_flow: Vec<(usize, i64)> =
+            valves.values().map(|v| (v.name, v.flow)).collect();
+        sorted_by_flow.sort_by_key(|(_, f)| *f);
+        sorted_by_flow.reverse();
+
+        let (_, cost) = astar(
+            &StateWithElephant::new(&valves, start),
+            |state| state.moves(&valves),
+            |state| state.heuristic(&sorted_by_flow, &valves),
+            |state| state.finished(&valves),
+        )
+        .unwrap();
+
+        (-cost).to_string()
+    }
 }

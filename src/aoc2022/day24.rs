@@ -1,11 +1,24 @@
+use crate::Runit;
+
 use num::integer::Integer;
 
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap};
 
+#[derive(Default)]
+pub struct AocDay24 {
+    map: Map,
+}
+
+impl AocDay24 {
+    pub fn new() -> Self {
+        AocDay24::default()
+    }
+}
+
 // Posisition struct
 // can't use complex numbers cause module operations
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Default)]
 struct Pos {
     x: usize,
     y: usize,
@@ -87,6 +100,7 @@ impl Cell {
 }
 
 // Definin the map
+#[derive(Default)]
 struct Map {
     width: usize,
     height: usize,
@@ -280,23 +294,20 @@ fn dijkstra(map: &Map, start: Pos, start_time: usize, finish: Pos) -> usize {
     unreachable!()
 }
 
-fn first_part(input: &str) -> usize {
-    let map = Map::parse(input);
-    dijkstra(&map, map.start, 0, map.finish)
-}
+impl Runit for AocDay24 {
+    fn parse(&mut self) {
+        let input = crate::read_file("2022".to_string(), "24".to_string());
+        self.map = Map::parse(&input);
+    }
 
-// two searchs dijsktra to get back to the start and then go back to the final position
-fn second_part(input: &str) -> usize {
-    let map = Map::parse(input);
-    let t1 = dijkstra(&map, map.start, 0, map.finish);
-    let t2 = dijkstra(&map, map.finish, t1, map.start);
-    dijkstra(&map, map.start, t2, map.finish)
-}
+    fn first_part(&mut self) -> String {
+        dijkstra(&self.map, self.map.start, 0, self.map.finish).to_string()
+    }
 
-// main function
-fn main() {
-    let file = std::fs::read_to_string("./input").expect("couldn't read input file");
-
-    println!("Output 1: {}", first_part(&file));
-    println!("Output 2: {}", second_part(&file));
+    // two searchs dijsktra to get back to the start and then go back to the final position
+    fn second_part(&mut self) -> String {
+        let t1 = dijkstra(&self.map, self.map.start, 0, self.map.finish);
+        let t2 = dijkstra(&self.map, self.map.finish, t1, self.map.start);
+        dijkstra(&self.map, self.map.start, t2, self.map.finish).to_string()
+    }
 }

@@ -1,3 +1,16 @@
+use crate::Runit;
+
+#[derive(Default)]
+pub struct AocDay25 {
+    file: String,
+}
+
+impl AocDay25 {
+    pub fn new() -> Self {
+        AocDay25::default()
+    }
+}
+
 fn snafu_decimal(number: &str) -> i64 {
     let mut place: i64 = 1;
     let mut result: i64 = 0;
@@ -33,15 +46,21 @@ fn decimal_snafu(mut number: i64) -> String {
     total.chars().rev().collect::<String>()
 }
 
-fn first_part(file: &str) {
-    let number_snafu = file.trim().lines().map(|i| snafu_decimal(i)).sum::<i64>();
-    let decimal = decimal_snafu(number_snafu);
-    println!("Output: {}", decimal);
-    println!("Merry christmas!");
-}
-
-fn main() {
-    let file = std::fs::read_to_string("./input").expect("Couldn't read input file");
-
-    first_part(&file);
+impl Runit for AocDay25 {
+    fn parse(&mut self) {
+        self.file = crate::read_file("2022".to_string(), "25".to_string());
+    }
+    fn first_part(&mut self) -> String {
+        let number_snafu = self
+            .file
+            .trim()
+            .lines()
+            .map(|i| snafu_decimal(i))
+            .sum::<i64>();
+        let decimal = decimal_snafu(number_snafu);
+        decimal.to_string()
+    }
+    fn second_part(&mut self) -> String {
+        "You make a smoothie with all fifty stars and deliver it to the reindeer! The sleigh is already warmed up by the time they finish eating.".to_string()
+    }
 }

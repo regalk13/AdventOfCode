@@ -1,4 +1,17 @@
+use crate::Runit;
+
 use std::collections::HashMap;
+
+#[derive(Default)]
+pub struct AocDay22 {
+    file_lines: Vec<String>,
+}
+
+impl AocDay22 {
+    pub fn new() -> Self {
+        AocDay22::default()
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 struct Cursor {
@@ -322,43 +335,41 @@ impl Parser {
         self.start_pos = start_pos;
     }
 }
-
-fn first_part(file_lines: &[String]) -> i64 {
-    let mut parsed = Parser::default();
-    parsed.parse_lines(file_lines);
-    let mut cursor = Cursor {
-        pos: parsed.start_pos,
-        dir: (0, 1),
-    };
-
-    for instruction in parsed.instructions {
-        cursor = instruction.execute(&cursor, &parsed.tiles, true);
+impl Runit for AocDay22 {
+    fn parse(&mut self) {
+        let file = crate::read_file("2022".to_string(), "22".to_string());
+        let file_lines = file.lines().map(|s| s.to_string()).collect::<Vec<String>>();
+        self.file_lines = file_lines
     }
-    let password = cursor.password();
+    fn first_part(&mut self) -> String {
+        let mut parsed = Parser::default();
+        parsed.parse_lines(&self.file_lines);
+        let mut cursor = Cursor {
+            pos: parsed.start_pos,
+            dir: (0, 1),
+        };
 
-    password
-}
+        for instruction in parsed.instructions {
+            cursor = instruction.execute(&cursor, &parsed.tiles, true);
+        }
+        let password = cursor.password();
 
-fn second_part(file_lines: &[String]) -> i64 {
-    let mut parsed = Parser::default();
-    parsed.parse_lines(file_lines);
-    let mut cursor = Cursor {
-        pos: parsed.start_pos,
-        dir: (0, 1),
-    };
-
-    for instruction in parsed.instructions {
-        cursor = instruction.execute(&cursor, &parsed.tiles, false);
+        password.to_string()
     }
-    let password = cursor.password();
 
-    password
-}
+    fn second_part(&mut self) -> String {
+        let mut parsed = Parser::default();
+        parsed.parse_lines(&self.file_lines);
+        let mut cursor = Cursor {
+            pos: parsed.start_pos,
+            dir: (0, 1),
+        };
 
-fn main() {
-    let file = std::fs::read_to_string("./input").expect("Unable to open file");
-    let file_lines = file.lines().map(|s| s.to_string()).collect::<Vec<String>>();
+        for instruction in parsed.instructions {
+            cursor = instruction.execute(&cursor, &parsed.tiles, false);
+        }
+        let password = cursor.password();
 
-    println!("Output 1: {}", first_part(&file_lines));
-    println!("Output 2: {}", second_part(&file_lines));
+        password.to_string()
+    }
 }

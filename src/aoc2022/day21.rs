@@ -1,4 +1,17 @@
+use crate::Runit;
+
 use std::collections::HashMap;
+
+#[derive(Default)]
+pub struct AocDay21 {
+    hash: HashMap<String, Value>,
+}
+
+impl AocDay21 {
+    pub fn new() -> Self {
+        AocDay21::default()
+    }
+}
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 enum Operation {
@@ -24,30 +37,6 @@ impl Operation {
 enum Value {
     Integer(i64),
     Op(String, Operation, String),
-}
-
-fn parser(file: &str) -> HashMap<String, Value> {
-    // Hashmap key: monkey_name, value: operation or value <- Value { i64, operation <- + - * / }
-    file.trim()
-        .lines()
-        .map(|line| {
-            let (name, value) = line.split_once(": ").unwrap();
-
-            if let Ok(num) = value.parse::<i64>() {
-                (name.to_string(), Value::Integer(num))
-            } else {
-                let expr = value.split_whitespace().collect::<Vec<&str>>();
-                (
-                    name.to_string(),
-                    Value::Op(
-                        expr[0].to_string(),
-                        Operation::parse(expr[1].chars().next().unwrap()),
-                        expr[2].to_string(),
-                    ),
-                )
-            }
-        })
-        .collect::<HashMap<String, Value>>()
 }
 
 fn make_operation(hash: &HashMap<String, Value>, key: &String) -> i64 {
@@ -116,31 +105,52 @@ fn find_adjustment(
     }
 }
 
-fn second_part(hash: &HashMap<String, Value>) -> i64 {
-    let root_name = "root".to_string();
-    let path = find_me(&root_name, &hash).unwrap();
-    let path = path.iter().rev().copied().collect::<Vec<_>>();
+impl Runit for AocDay21 {
+    fn parse(&mut self) {
+        // Hashmap key: monkey_name, value: operation or value <- Value { i64, operation <- + - * / }
+        let file = crate::read_file("2022".to_string(), "21".to_string());
+        self.hash = file
+            .trim()
+            .lines()
+            .map(|line| {
+                let (name, value) = line.split_once(": ").unwrap();
 
-    let (left, right) = match hash.get(&root_name).unwrap() {
-        Value::Integer(_) => panic!("Root without data"),
-        Value::Op(left, _, right) => (left, right),
-    };
+                if let Ok(num) = value.parse::<i64>() {
+                    (name.to_string(), Value::Integer(num))
+                } else {
+                    let expr = value.split_whitespace().collect::<Vec<&str>>();
+                    (
+                        name.to_string(),
+                        Value::Op(
+                            expr[0].to_string(),
+                            Operation::parse(expr[1].chars().next().unwrap()),
+                            expr[2].to_string(),
+                        ),
+                    )
+                }
+            })
+            .collect::<HashMap<String, Value>>()
+    }
+    fn second_part(&mut self) -> String {
+        let root_name = "root".to_string();
+        let path = find_me(&root_name, &self.hash).unwrap();
+        let path = path.iter().rev().copied().collect::<Vec<_>>();
 
-    let right_num = if left == path[1] {
-        make_operation(&hash, &right)
-    } else {
-        make_operation(&hash, &left)
-    };
+        let (left, right) = match self.hash.get(&root_name).unwrap() {
+            Value::Integer(_) => panic!("Root without data"),
+            Value::Op(left, _, right) => (left, right),
+        };
 
-    find_adjustment(&path, 1, &hash, right_num)
-}
+        let right_num = if left == path[1] {
+            make_operation(&self.hash, &right)
+        } else {
+            make_operation(&self.hash, &left)
+        };
 
-fn first_part(hash: &HashMap<String, Value>) -> i64 {
-    make_operation(hash, &"root".to_string())
-}
-fn main() {
-    let file = std::fs::read_to_string("./input").expect("Couldn't read input file");
-    let parsed = parser(&file);
-    println!("Output 1: {:?}", first_part(&parsed));
-    println!("Output 2: {:?}", second_part(&parsed));
+        find_adjustment(&path, 1, &self.hash, right_num).to_string()
+    }
+
+    fn first_part(&mut self) -> String {
+        make_operation(&self.hash, &"root".to_string()).to_string()
+    }
 }

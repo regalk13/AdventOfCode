@@ -39,9 +39,23 @@ pub fn run_2022(day: u32) {
     let mut day11 = day11::AocDay11::new();
     let mut day12 = day12::AocDay12::new();
     let mut day13 = day13::AocDay13::new();
+    let mut day14 = day14::AocDay14::new();
+    let mut day15 = day15::AocDay15::new();
+    let mut day16 = day16::AocDay16::new();
+    let mut day17 = day17::AocDay17::new();
+    let mut day18 = day18::AocDay18::new();
+    let mut day19 = day19::AocDay19::new();
+    let mut day20 = day20::AocDay20::new();
+    let mut day21 = day21::AocDay21::new();
+    let mut day22 = day22::AocDay22::new();
+    let mut day23 = day23::AocDay23::new();
+    let mut day24 = day24::AocDay24::new();
+    let mut day25 = day25::AocDay25::new();
     let mut days: Vec<&mut dyn Runit> = vec![
         &mut day01, &mut day02, &mut day03, &mut day04, &mut day05, &mut day06, &mut day07,
-        &mut day08, &mut day09, &mut day10, &mut day11, &mut day12, &mut day13,
+        &mut day08, &mut day09, &mut day10, &mut day11, &mut day12, &mut day13, &mut day14,
+        &mut day15, &mut day16, &mut day17, &mut day18, &mut day19, &mut day20, &mut day21,
+        &mut day22, &mut day23, &mut day24, &mut day25,
     ];
     crate::run(days[day as usize - 1]);
 }

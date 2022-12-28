@@ -1,5 +1,18 @@
+use crate::Runit;
+
 use itertools::Itertools;
 use std::collections::HashSet;
+
+#[derive(Default, Clone)]
+pub struct AocDay19 {
+    blueprints: Vec<Blueprint>,
+}
+
+impl AocDay19 {
+    pub fn new() -> Self {
+        AocDay19::default()
+    }
+}
 
 // Defining state of current blueprint process
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Hash)]
@@ -16,7 +29,7 @@ struct State {
 }
 
 // Blueprint values
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 struct Blueprint {
     idx: i32,
     ore_cost_in_ore: i32,
@@ -27,19 +40,67 @@ struct Blueprint {
     geode_cost_in_obsidian: i32,
 }
 
-// First part function
-fn first_part(input: &str) -> i32 {
-    // Get blueprints
-    let blueprints = parse(input);
-    // Return the value of the function get_best and multiply by the inndex
-    blueprints
-        .iter()
-        .map(|i| {
-            i.idx
-                * get_best(
-                    &i,
+impl Runit for AocDay19 {
+    // Parsing the input, returning a vec of blueprints
+    fn parse(&mut self) {
+        let input = crate::read_file("2022".to_string(), "19".to_string());
+        self.blueprints = input
+            .lines()
+            .map(|l| {
+                let el = l.split_ascii_whitespace().collect_vec();
+                Blueprint {
+                    idx: el[1][..el[1].len() - 1].parse::<i32>().unwrap(),
+                    ore_cost_in_ore: el[6].parse::<i32>().unwrap(),
+                    clay_cost_in_ore: el[12].parse::<i32>().unwrap(),
+                    obs_cost_in_ore: el[18].parse::<i32>().unwrap(),
+                    obs_cost_in_clay: el[21].parse::<i32>().unwrap(),
+                    geode_cost_in_ore: el[27].parse::<i32>().unwrap(),
+                    geode_cost_in_obsidian: el[30].parse::<i32>().unwrap(),
+                }
+            })
+            .collect_vec();
+    }
+    // First part function
+    fn first_part(&mut self) -> String {
+        // Get blueprints
+
+        // Return the value of the function get_best and multiply by the inndex
+        self.blueprints
+            .clone()
+            .iter()
+            .map(|i| {
+                i.idx
+                    * get_best(
+                        &i,
+                        State {
+                            time_left: 24,
+                            ore: 0,
+                            clay: 0,
+                            obs: 0,
+                            geode: 0,
+                            ore_robot: 1,
+                            clay_robot: 0,
+                            obs_robot: 0,
+                            geode_robot: 0,
+                        },
+                    )
+            })
+            .sum::<i32>()
+            .to_string()
+    }
+
+    // Second part solution
+    fn second_part(&mut self) -> String {
+        // Take first 3 blueprints and multply by the best sequence of blueprints
+        self.blueprints
+            .clone()
+            .iter()
+            .take(3)
+            .map(|b| {
+                get_best(
+                    &b,
                     State {
-                        time_left: 24,
+                        time_left: 32,
                         ore: 0,
                         clay: 0,
                         obs: 0,
@@ -50,37 +111,11 @@ fn first_part(input: &str) -> i32 {
                         geode_robot: 0,
                     },
                 )
-        })
-        .sum()
+            })
+            .product::<i32>()
+            .to_string()
+    }
 }
-
-// Second part solution
-fn second_part(input: &str) -> i32 {
-    // Parsing input
-    let blueprints = parse(input);
-    // Take first 3 blueprints and multply by the best sequence of blueprints
-    blueprints
-        .iter()
-        .take(3)
-        .map(|b| {
-            get_best(
-                &b,
-                State {
-                    time_left: 32,
-                    ore: 0,
-                    clay: 0,
-                    obs: 0,
-                    geode: 0,
-                    ore_robot: 1,
-                    clay_robot: 0,
-                    obs_robot: 0,
-                    geode_robot: 0,
-                },
-            )
-        })
-        .product()
-}
-
 // Get the best of blue prints!
 fn get_best(blueprint: &Blueprint, start_state: State) -> i32 {
     let mut scanned: HashSet<State> = HashSet::with_capacity(50 * 1024 * 1024);
@@ -207,31 +242,4 @@ fn dig(mut state: State) -> State {
     state.geode += state.geode_robot;
     state.time_left -= 1;
     state
-}
-
-// Parsing the input, returning a vec of blueprints
-fn parse(input: &str) -> Vec<Blueprint> {
-    input
-        .lines()
-        .map(|l| {
-            let el = l.split_ascii_whitespace().collect_vec();
-            Blueprint {
-                idx: el[1][..el[1].len() - 1].parse::<i32>().unwrap(),
-                ore_cost_in_ore: el[6].parse::<i32>().unwrap(),
-                clay_cost_in_ore: el[12].parse::<i32>().unwrap(),
-                obs_cost_in_ore: el[18].parse::<i32>().unwrap(),
-                obs_cost_in_clay: el[21].parse::<i32>().unwrap(),
-                geode_cost_in_ore: el[27].parse::<i32>().unwrap(),
-                geode_cost_in_obsidian: el[30].parse::<i32>().unwrap(),
-            }
-        })
-        .collect_vec()
-}
-
-fn main() {
-    // Getting the input file
-    let file = std::fs::read_to_string("./input").expect("Expected file");
-
-    println!("Output 1: {:?}", first_part(&file));
-    println!("Output 2: {:?}", second_part(&file));
 }

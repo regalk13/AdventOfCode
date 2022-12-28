@@ -1,6 +1,19 @@
+use crate::Runit;
+
 use std::collections::HashMap;
 
-#[derive(Default, Debug)]
+#[derive(Default)]
+pub struct AocDay14 {
+    cave: Cave,
+}
+
+impl AocDay14 {
+    pub fn new() -> Self {
+        AocDay14::default()
+    }
+}
+
+#[derive(Default, Debug, Clone)]
 struct Cave {
     location: HashMap<(i32, i32), char>,
     bottom: i32,
@@ -64,47 +77,40 @@ impl Cave {
     }
 }
 
-fn first_part(file: &str) {
-    let mut cave = Cave::default();
-
-    for line in file.trim().split("\n").collect::<Vec<&str>>() {
-        let mut iter = line.split(" -> ");
-        let mut start = Cave::convert(iter.next()).unwrap();
-        while let Some(end) = Cave::convert(iter.next()) {
-            cave.draw_line(start, end);
-            start = end;
+impl Runit for AocDay14 {
+    fn parse(&mut self) {
+        let mut cave = Cave::default();
+        let file = crate::read_file("2022".to_string(), "14".to_string());
+        for line in file.trim().split("\n").collect::<Vec<&str>>() {
+            let mut iter = line.split(" -> ");
+            let mut start = Cave::convert(iter.next()).unwrap();
+            while let Some(end) = Cave::convert(iter.next()) {
+                cave.draw_line(start, end);
+                start = end;
+            }
         }
+        self.cave = cave;
     }
 
-    let mut output = 0;
-    while cave.drop_sand() {
-        output += 1;
-    }
-
-    println!("Output: {}", output);
-}
-
-fn second_part(file: &str) {
-    let mut cave = Cave::default();
-    cave.floor = true;
-    for line in file.trim().split("\n").collect::<Vec<&str>>() {
-        let mut iter = line.split(" -> ");
-        let mut start = Cave::convert(iter.next()).unwrap();
-        while let Some(end) = Cave::convert(iter.next()) {
-            cave.draw_line(start, end);
-            start = end;
+    fn first_part(&mut self) -> String {
+        let mut output = 0;
+        let mut cave = self.cave.clone();
+        while cave.drop_sand() {
+            output += 1;
         }
+
+        output.to_string()
     }
 
-    let mut output = 0;
-    while cave.drop_sand() {
-        output += 1;
-    }
+    fn second_part(&mut self) -> String {
+        self.cave.floor = true;
+        let mut cave = self.cave.clone();
+        let mut output = 0;
 
-    println!("Output 2: {}", output);
-}
-fn main() {
-    let file = std::fs::read_to_string("./input").expect("Couldn't read input file");
-    first_part(&file);
-    second_part(&file);
+        while cave.drop_sand() {
+            output += 1;
+        }
+
+        output.to_string()
+    }
 }

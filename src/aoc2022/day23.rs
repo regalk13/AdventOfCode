@@ -1,7 +1,21 @@
+use crate::Runit;
+
 use num_complex::Complex;
 use std::collections::{HashMap, HashSet};
 
+#[derive(Default, Clone)]
+pub struct AocDay23 {
+    elves_info: Elves,
+}
+
+impl AocDay23 {
+    pub fn new() -> Self {
+        AocDay23::default()
+    }
+}
+
 // Elves, hashet of the map and the count for part 2
+#[derive(Default, Clone)]
 struct Elves {
     elves: HashSet<Complex<i32>>,
     count: i32,
@@ -194,31 +208,32 @@ impl Elves {
     }
 }
 
-fn second_part(file: &str) -> i32 {
-    let mut elves_info = Elves::new(file);
-    elves_info.move_elves_part2();
-    // Return the count of iterations
-    elves_info.count
-}
+impl Runit for AocDay23 {
+    fn parse(&mut self) {
+        self.elves_info = Elves::new(&crate::read_file("2022".to_string(), "23".to_string()));
+    }
 
-fn first_part(file: &str) -> i32 {
-    let mut elves_info = Elves::new(file);
-    elves_info.move_elves();
-    // using the complex numbers: x - real part, y - imaginary part
-    // Min value of x, max value of x, min value of y and max value of y
-    // this gives you the size of the rectangle where the elves are
-    let minx = elves_info.elves.iter().map(|x| x.re).min();
-    let maxx = elves_info.elves.iter().map(|x| x.re).max();
-    let miny = elves_info.elves.iter().map(|x| x.im).min();
-    let maxy = elves_info.elves.iter().map(|x| x.im).max();
-    // Return the empty spaces
-    (maxx.unwrap() - minx.unwrap() + 1) * (maxy.unwrap() - miny.unwrap() + 1)
-        - elves_info.elves.len() as i32
-}
+    fn second_part(&mut self) -> String {
+        let mut elves_info = self.elves_info.clone();
+        elves_info.move_elves_part2();
+        // Return the count of iterations
+        elves_info.count.to_string()
+    }
 
-fn main() {
-    let file = std::fs::read_to_string("./input").expect("Expected file");
+    fn first_part(&mut self) -> String {
+        let mut elves_info = self.elves_info.clone();
 
-    println!("Output 1: {}", first_part(&file));
-    println!("Output 2: {}", second_part(&file));
+        elves_info.move_elves();
+        // using the complex numbers: x - real part, y - imaginary part
+        // Min value of x, max value of x, min value of y and max value of y
+        // this gives you the size of the rectangle where the elves are
+        let minx = elves_info.elves.iter().map(|x| x.re).min();
+        let maxx = elves_info.elves.iter().map(|x| x.re).max();
+        let miny = elves_info.elves.iter().map(|x| x.im).min();
+        let maxy = elves_info.elves.iter().map(|x| x.im).max();
+        // Return the empty spaces
+        ((maxx.unwrap() - minx.unwrap() + 1) * (maxy.unwrap() - miny.unwrap() + 1)
+            - elves_info.elves.len() as i32)
+            .to_string()
+    }
 }
