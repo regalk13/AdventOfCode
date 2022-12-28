@@ -5,11 +5,14 @@
 
 ## Usage
 
-Runnning a solution, for example day 4 from 2022:
+### Runnning a solution
+for example day 4 from 2022:
 ```
 cargo run 2022 4
 ```
-Downloading a input, add your cookie session from the [website](https://adventofcode.com/), then compile the file `tools/get-input.rs`, example: `rustc get-input.rs && ./main 2022 13 > input`. This previous command will download the input of the day 13 from 2022.
+### Downloading an input
+
+First add your cookie session from the [website](https://adventofcode.com/) to the file `tools/get-input.rs`, then compile it. Example: `rustc get-input.rs && ./main 2022 13 > input`. This previous command will download the input of the day 13 from 2022.
 
 ## Gallery
 <div align="center">
