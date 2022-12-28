@@ -51,11 +51,18 @@ pub fn run_2022(day: u32) {
     let mut day23 = day23::AocDay23::new();
     let mut day24 = day24::AocDay24::new();
     let mut day25 = day25::AocDay25::new();
+
     let mut days: Vec<&mut dyn Runit> = vec![
         &mut day01, &mut day02, &mut day03, &mut day04, &mut day05, &mut day06, &mut day07,
         &mut day08, &mut day09, &mut day10, &mut day11, &mut day12, &mut day13, &mut day14,
         &mut day15, &mut day16, &mut day17, &mut day18, &mut day19, &mut day20, &mut day21,
         &mut day22, &mut day23, &mut day24, &mut day25,
     ];
+
+    if day == 0 || (day - 1) >= days.len() as u32 {
+        println!("Invalid day! it's out of the range");
+        std::process::exit(1);
+    }
+
     crate::run(days[day as usize - 1]);
 }
