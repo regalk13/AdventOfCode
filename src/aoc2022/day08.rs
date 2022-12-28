@@ -13,7 +13,10 @@ impl AocDay08 {
 impl Runit for AocDay08 {
     fn parse(&mut self) {
         let file = crate::read_file("2022".to_string(), "08".to_string());
-        self.input = file.split("\n").map(|s| s.to_string()).collect::<Vec<String>>();
+        self.input = file
+            .split("\n")
+            .map(|s| s.to_string())
+            .collect::<Vec<String>>();
     }
     fn second_part(&mut self) -> String {
         let binding = &self.input;

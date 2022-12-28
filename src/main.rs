@@ -45,6 +45,6 @@ fn main() {
 pub fn run<T: Runit + ?Sized>(day: &mut T) {
     day.parse();
 
-    println!("Part 1 {}", day.first_part());
-    println!("Part 2 {}", day.second_part());
+    println!("Part 1 \n{}", day.first_part());
+    println!("Part 2 \n{}", day.second_part());
 }

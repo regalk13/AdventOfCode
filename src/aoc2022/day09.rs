@@ -13,7 +13,6 @@ impl AocDay09 {
     }
 }
 
-
 #[derive(Debug, Clone)]
 enum Moves {
     Up = 1,
@@ -102,10 +101,13 @@ fn move_second(dx: i32, dy: i32, mut knots: Vec<(i32, i32)>) -> Vec<(i32, i32)> 
 impl Runit for AocDay09 {
     fn parse(&mut self) {
         let file = crate::read_file("2022".to_string(), "09".to_string());
-        self.moves = file.trim().split("\n").map(|l| l.to_string()).collect::<Vec<String>>();
+        self.moves = file
+            .trim()
+            .split("\n")
+            .map(|l| l.to_string())
+            .collect::<Vec<String>>();
     }
     fn second_part(&mut self) -> String {
-
         let mut knots = (0..10).map(|c| (c, c)).collect::<Vec<_>>();
 
         let mut tail_visited = HashSet::new();
@@ -134,7 +136,6 @@ impl Runit for AocDay09 {
         tail_visited.len().to_string()
     }
     fn first_part(&mut self) -> String {
-
         let mut hx = 0;
         let mut hy = 0;
         let mut tx = 0;

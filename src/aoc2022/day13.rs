@@ -1,5 +1,18 @@
+use crate::Runit;
+
 use std::cmp::Ordering;
 use std::str::Chars;
+
+#[derive(Default)]
+pub struct AocDay13 {
+    signals: Vec<String>,
+}
+
+impl AocDay13 {
+    pub fn new() -> Self {
+        AocDay13::default()
+    }
+}
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 enum Val {
@@ -106,52 +119,56 @@ impl Ord for Val {
     }
 }
 
-fn second_part(file: &str) {
-    let signals = file.split("\n").filter(|f| *f != "").collect::<Vec<&str>>();
+impl Runit for AocDay13 {
+    fn parse(&mut self) {
+        let file = crate::read_file("2022".to_string(), "13".to_string());
 
-    let mut output = 1;
-    let mut pairs: Vec<Val> = vec![];
-
-    for pair in signals {
-        pairs.push(Val::parse(pair));
+        self.signals = file
+            .split("\n")
+            .filter(|f| *f != "")
+            .map(|l| l.to_string())
+            .collect::<Vec<String>>();
     }
-    let d2 = Val::parse("[[2]]");
-    let d6 = Val::parse("[[6]]");
+    fn second_part(&mut self) -> String {
+        let signals = &self.signals;
 
-    let mut list = vec![d2.clone(), d6.clone()];
-    list.extend(pairs.iter().cloned());
+        let mut output = 1;
+        let mut pairs: Vec<Val> = vec![];
 
-    list.sort();
-
-    for (index, value) in list.iter().enumerate() {
-        if *value == d2 || *value == d6 {
-            output *= index + 1;
+        for pair in signals {
+            pairs.push(Val::parse(pair));
         }
-    }
-    println!("Output 2: {:?}", output);
-}
+        let d2 = Val::parse("[[2]]");
+        let d6 = Val::parse("[[6]]");
 
-fn first_part(file: &str) {
-    let signals = file.split("\n").filter(|f| *f != "").collect::<Vec<&str>>();
+        let mut list = vec![d2.clone(), d6.clone()];
+        list.extend(pairs.iter().cloned());
 
-    let mut output = 0;
-    let mut pairs: Vec<Val> = vec![];
+        list.sort();
 
-    for pair in signals {
-        pairs.push(Val::parse(pair));
-    }
-
-    for (i, p) in pairs.chunks(2).enumerate() {
-        if p[0] < p[1] {
-            output += i + 1;
+        for (index, value) in list.iter().enumerate() {
+            if *value == d2 || *value == d6 {
+                output *= index + 1;
+            }
         }
+        output.to_string()
     }
-    println!("Output: {}", output);
-}
 
-fn main() {
-    let file = std::fs::read_to_string("./input").expect("Can't read the signal input");
+    fn first_part(&mut self) -> String {
+        let signals = &self.signals;
 
-    first_part(&file);
-    second_part(&file);
+        let mut output = 0;
+        let mut pairs: Vec<Val> = vec![];
+
+        for pair in signals {
+            pairs.push(Val::parse(pair));
+        }
+
+        for (i, p) in pairs.chunks(2).enumerate() {
+            if p[0] < p[1] {
+                output += i + 1;
+            }
+        }
+        output.to_string()
+    }
 }
