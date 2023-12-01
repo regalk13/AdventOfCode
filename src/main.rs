@@ -2,8 +2,10 @@
 #![feature(iter_intersperse)]
 use std::time::{Duration, Instant};
 mod aoc2022;
+mod aoc2023;
 
 use aoc2022::*;
+use aoc2023::*;
 
 pub trait Runit {
     fn parse(&mut self);
@@ -25,9 +27,9 @@ fn main() {
         std::process::exit(1);
     }
 
-    let years = vec![run_2022];
+    let years = vec![run_2022, run_2023];
     if let Ok(year) = args[1].parse::<u32>() {
-        if (2015..=2022).contains(&year) {
+        if (2022..=2023).contains(&year) {
             if let Ok(day_) = args[2].parse::<u32>() {
                 println!("Running day {}, from {}", day_, year);
                 years[year as usize - 2022](day_)
@@ -66,7 +68,7 @@ pub fn run<T: Runit + ?Sized>(day: &mut T) {
     println!();
     println!("Part 2");
     let start = Instant::now();
-    let part_2 = day.first_part();
+    let part_2 = day.second_part();
     let part2_time = start.elapsed().as_millis();
     println!(
         "Time running: {:3}.{:03}",
