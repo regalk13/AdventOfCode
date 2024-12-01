@@ -24,7 +24,7 @@ impl Runit for AocDay01 {
 
         lines.into_iter().for_each(|s| {
             let values: Vec<i32> = s
-                .split("   ")
+                .split_whitespace()
                 .filter(|s| !s.is_empty())
                 .map(|s| s.parse::<i32>().unwrap())
                 //.map(|s| s.to_string())
