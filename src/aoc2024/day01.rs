@@ -1,5 +1,4 @@
 use crate::Runit;
-use std::collections::HashMap;
 
 #[derive(Default)]
 pub struct AocDay01 {

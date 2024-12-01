@@ -1,6 +1,6 @@
 #![feature(iter_array_chunks)]
 #![feature(iter_intersperse)]
-use std::time::{Duration, Instant};
+use std::time::Instant;
 mod aoc2022;
 mod aoc2023;
 mod aoc2024;
