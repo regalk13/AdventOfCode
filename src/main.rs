@@ -3,9 +3,11 @@
 use std::time::{Duration, Instant};
 mod aoc2022;
 mod aoc2023;
+mod aoc2024;
 
 use aoc2022::*;
 use aoc2023::*;
+use aoc2024::*;
 
 pub trait Runit {
     fn parse(&mut self);
@@ -27,9 +29,9 @@ fn main() {
         std::process::exit(1);
     }
 
-    let years = vec![run_2022, run_2023];
+    let years = vec![run_2022, run_2023, run_2024];
     if let Ok(year) = args[1].parse::<u32>() {
-        if (2022..=2023).contains(&year) {
+        if (2022..=2024).contains(&year) {
             if let Ok(day_) = args[2].parse::<u32>() {
                 println!("Running day {}, from {}", day_, year);
                 years[year as usize - 2022](day_)
