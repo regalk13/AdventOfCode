@@ -16,6 +16,12 @@ First add your cookie session from the [website](https://adventofcode.com/) to t
 
 ## Gallery
 
+### 2024
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/02fdfa3d-b9f0-49c8-8ea6-c4f82beb7636" />
+</div>
+
+
 ### 2023
 <div align="center">
   <img src="https://github.com/regalk13/AdventOfCode/assets/72028266/ef7fe482-292d-43f2-b257-724acb2615ec" />
