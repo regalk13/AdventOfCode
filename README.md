@@ -10,15 +10,12 @@ for example day 4 from 2022:
 ```
 cargo run 2022 4
 ```
-### Downloading an input
-
-First add your cookie session from the [website](https://adventofcode.com/) to the file `tools/get-input.rs`, then compile it. Example: `rustc get-input.rs && ./main 2022 13 > input`. This previous command will download the input of the day 13 from 2022.
 
 ## Gallery
 
 ### 2024
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/02fdfa3d-b9f0-49c8-8ea6-c4f82beb7636" />
+  <img src="https://github.com/user-attachments/assets/add1b308-a83a-46d4-972b-ec8585bcab34" />
 </div>
 
 
