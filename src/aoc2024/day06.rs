@@ -57,7 +57,6 @@ impl AocDay06 {
                 }
                 seen.insert((guard_location, direction.clone()));
             } else {
-                // Rotate the direction if hitting an obstacle
                 direction = match direction {
                     Direction::Up => Direction::Right,
                     Direction::Right => Direction::Down,
@@ -154,16 +153,10 @@ impl Runit for AocDay06 {
 
     fn second_part(&mut self) -> String {
         let guard_location = self.find_guard();
-        
-        let mut positions = Vec::new();
-        let all_positions: Vec<(i32, i32)> = (0..self.lines.len() as i32)
-            .flat_map(|y| (0..self.lines[0].len() as i32).map(move |x| (y, x)))
-            .collect();
 
-        let valid_positions: Vec<(i32, i32)> = all_positions
-            .into_iter()
-            .filter(|pos| self.lines[pos.0 as usize][pos.1 as usize] != '#')
-            .collect();
+        let mut positions = Vec::new();
+
+        let valid_positions: Vec<(i32, i32)> = self.trace_path(guard_location, Direction::Up);
 
         for position in valid_positions {
             let mut cloned_lines = self.lines.clone();
