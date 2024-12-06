@@ -1,0 +1,179 @@
+use crate::Runit;
+
+#[derive(Default)]
+pub struct AocDay06 {
+    lines: Vec<Vec<char>>,
+}
+
+impl AocDay06 {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
+#[derive(Clone, Hash, PartialEq, Eq)]
+enum Direction {
+    Up,
+    Left,
+    Right,
+    Down,
+}
+
+impl AocDay06 {
+    fn is_guard_in_loop(
+        &self,
+        mut guard_location: (i32, i32),
+        modified_lines: &Vec<Vec<char>>,
+    ) -> bool {
+        let mut direction = Direction::Up;
+        let mut seen = std::collections::HashSet::new();
+
+        loop {
+            let (mut factor_direction_y, mut factor_direction_x) = (0, 0);
+
+            match direction {
+                Direction::Up => factor_direction_y = -1,
+                Direction::Down => factor_direction_y = 1,
+                Direction::Left => factor_direction_x = -1,
+                Direction::Right => factor_direction_x = 1,
+            }
+
+            let next_position = (
+                guard_location.0 + factor_direction_y,
+                guard_location.1 + factor_direction_x,
+            );
+
+            if !self.in_bounds_with_lines(next_position, modified_lines) {
+                return false;
+            }
+
+            let next_char = modified_lines[next_position.0 as usize][next_position.1 as usize];
+
+            if next_char != '#' {
+                guard_location = next_position;
+
+                if seen.contains(&(guard_location, direction.clone())) {
+                    return true;
+                }
+                seen.insert((guard_location, direction.clone()));
+            } else {
+                // Rotate the direction if hitting an obstacle
+                direction = match direction {
+                    Direction::Up => Direction::Right,
+                    Direction::Right => Direction::Down,
+                    Direction::Down => Direction::Left,
+                    Direction::Left => Direction::Up,
+                };
+            }
+        }
+    }
+
+    fn in_bounds_with_lines(&self, position: (i32, i32), lines: &Vec<Vec<char>>) -> bool {
+        position.0 >= 0
+            && position.1 >= 0
+            && position.0 < lines.len() as i32
+            && position.1 < lines[0].len() as i32
+    }
+
+    fn find_guard(&self) -> (i32, i32) {
+        for (i, line) in self.lines.iter().enumerate() {
+            for (l, &char) in line.iter().enumerate() {
+                if char == '^' {
+                    return (i as i32, l as i32);
+                }
+            }
+        }
+        (0, 0)
+    }
+    
+    fn in_bounds(&self, position: (i32, i32)) -> bool {
+        position.0 >= 0
+            && position.1 >= 0
+            && position.0 < self.lines.len() as i32
+            && position.1 < self.lines[0].len() as i32
+    }
+
+    fn trace_path(&self, mut guard_location: (i32, i32), mut direction: Direction) -> Vec<(i32, i32)> {
+        let mut positions = Vec::new();
+
+        loop {
+            let (mut factor_direction_y, mut factor_direction_x) = (0, 0);
+
+            match direction {
+                Direction::Up => factor_direction_y = -1,
+                Direction::Down => factor_direction_y = 1,
+                Direction::Left => factor_direction_x = -1,
+                Direction::Right => factor_direction_x = 1,
+            }
+
+            let next_position = (
+                guard_location.0 + factor_direction_y,
+                guard_location.1 + factor_direction_x,
+            );
+
+            if !self.in_bounds(next_position) {
+                break;
+            }
+
+            let next_char = self.lines[next_position.0 as usize][next_position.1 as usize];
+
+            if next_char != '#' {
+                guard_location = next_position;
+                if !positions.contains(&guard_location) {
+                    positions.push(guard_location);
+                }
+            } else {
+                direction = match direction {
+                    Direction::Up => Direction::Right,
+                    Direction::Right => Direction::Down,
+                    Direction::Down => Direction::Left,
+                    Direction::Left => Direction::Up,
+                };
+            }
+        }
+
+        positions
+    }
+}
+
+impl Runit for AocDay06 {
+    fn parse(&mut self) {
+        let file = crate::read_file("2024".to_string(), "06".to_string());
+
+        self.lines = file
+            .lines()
+            .map(|line| line.chars().collect::<Vec<_>>())
+            .collect::<Vec<Vec<_>>>();
+    }
+
+    fn first_part(&mut self) -> String {
+        let guard_location = self.find_guard();
+        let positions = self.trace_path(guard_location, Direction::Up);
+        positions.len().to_string()
+    }
+
+    fn second_part(&mut self) -> String {
+        let guard_location = self.find_guard();
+        
+        let mut positions = Vec::new();
+        let all_positions: Vec<(i32, i32)> = (0..self.lines.len() as i32)
+            .flat_map(|y| (0..self.lines[0].len() as i32).map(move |x| (y, x)))
+            .collect();
+
+        let valid_positions: Vec<(i32, i32)> = all_positions
+            .into_iter()
+            .filter(|pos| self.lines[pos.0 as usize][pos.1 as usize] != '#')
+            .collect();
+
+        for position in valid_positions {
+            let mut cloned_lines = self.lines.clone();
+            cloned_lines[position.0 as usize][position.1 as usize] = '#';
+
+            if self.is_guard_in_loop(guard_location, &cloned_lines) {
+                positions.push(position);
+            }
+        }
+
+        positions.len().to_string()
+    }
+}
