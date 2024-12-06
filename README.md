@@ -15,7 +15,7 @@ cargo run 2022 4
 
 ### 2024
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/add1b308-a83a-46d4-972b-ec8585bcab34" />
+  <img src="https://github.com/user-attachments/assets/40430c39-afa5-4c63-b227-04797508362b" />
 </div>
 
 
