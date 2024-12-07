@@ -5,6 +5,7 @@ mod day03;
 mod day04;
 mod day05;
 mod day06;
+mod day07;
 
 pub fn run_2024(day: u32) {
     let mut day01 = day01::AocDay01::new();
@@ -13,8 +14,9 @@ pub fn run_2024(day: u32) {
     let mut day04 = day04::AocDay04::new();
     let mut day05 = day05::AocDay05::new();
     let mut day06 = day06::AocDay06::new();
+    let mut day07 = day07::AocDay07::new();
 
-    let mut days: Vec<&mut dyn Runit> = vec![&mut day01, &mut day02, &mut day03, &mut day04, &mut day05, &mut day06];
+    let mut days: Vec<&mut dyn Runit> = vec![&mut day01, &mut day02, &mut day03, &mut day04, &mut day05, &mut day06, &mut day07];
 
     if day == 0 || (day - 1) >= days.len() as u32 {
         println!("Invalid day! it's out of the range");
