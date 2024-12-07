@@ -43,7 +43,7 @@ impl AocDay06 {
                 guard_location.1 + factor_direction_x,
             );
 
-            if !self.in_bounds_with_lines(next_position, modified_lines) {
+            if !self.in_bounds(next_position) {
                 return false;
             }
 
@@ -67,13 +67,6 @@ impl AocDay06 {
         }
     }
 
-    fn in_bounds_with_lines(&self, position: (i32, i32), lines: &Vec<Vec<char>>) -> bool {
-        position.0 >= 0
-            && position.1 >= 0
-            && position.0 < lines.len() as i32
-            && position.1 < lines[0].len() as i32
-    }
-
     fn find_guard(&self) -> (i32, i32) {
         for (i, line) in self.lines.iter().enumerate() {
             for (l, &char) in line.iter().enumerate() {
@@ -93,7 +86,7 @@ impl AocDay06 {
     }
 
     fn trace_path(&self, mut guard_location: (i32, i32), mut direction: Direction) -> Vec<(i32, i32)> {
-        let mut positions = Vec::new();
+        let mut positions = std::collections::HashSet::new();
 
         loop {
             let (mut factor_direction_y, mut factor_direction_x) = (0, 0);
@@ -118,9 +111,7 @@ impl AocDay06 {
 
             if next_char != '#' {
                 guard_location = next_position;
-                if !positions.contains(&guard_location) {
-                    positions.push(guard_location);
-                }
+                positions.insert(guard_location);
             } else {
                 direction = match direction {
                     Direction::Up => Direction::Right,
@@ -131,7 +122,7 @@ impl AocDay06 {
             }
         }
 
-        positions
+        positions.into_iter().collect()
     }
 }
 
@@ -148,6 +139,7 @@ impl Runit for AocDay06 {
     fn first_part(&mut self) -> String {
         let guard_location = self.find_guard();
         let positions = self.trace_path(guard_location, Direction::Up);
+        println!("{:?}", positions);
         positions.len().to_string()
     }
 
@@ -159,12 +151,12 @@ impl Runit for AocDay06 {
         let valid_positions: Vec<(i32, i32)> = self.trace_path(guard_location, Direction::Up);
 
         for position in valid_positions {
-            let mut cloned_lines = self.lines.clone();
-            cloned_lines[position.0 as usize][position.1 as usize] = '#';
+            self.lines[position.0 as usize][position.1 as usize] = '#';
 
-            if self.is_guard_in_loop(guard_location, &cloned_lines) {
+            if self.is_guard_in_loop(guard_location, &self.lines) {
                 positions.push(position);
             }
+            self.lines[position.0 as usize][position.1 as usize] = '.';
         }
 
         positions.len().to_string()
