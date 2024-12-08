@@ -39,98 +39,102 @@ impl Runit for AocDay05 {
 
     fn first_part(&mut self) -> String {
         let mut rules: HashMap<i32, Vec<i32>> = HashMap::new();
-  
-        self.lines
-        .iter()
-        .filter(|l| l.contains("|"))
-        .for_each(|line| {
-            if let Some((x, y)) = line.split_once('|') {
-                let x: i32 = x.parse().unwrap();
-                let y: i32 = y.parse().unwrap();
-                rules.entry(x).or_insert_with(Vec::new).push(y);
-            }
-        });
 
-        let pages = self.lines
-        .iter()
-        .filter(|l| !l.contains("|"))
-        .map(|l| l.split(",").map(|s| s.to_string()).collect::<Vec<String>>())
-        .collect::<Vec<Vec<String>>>();
+        self.lines
+            .iter()
+            .filter(|l| l.contains("|"))
+            .for_each(|line| {
+                if let Some((x, y)) = line.split_once('|') {
+                    let x: i32 = x.parse().unwrap();
+                    let y: i32 = y.parse().unwrap();
+                    rules.entry(x).or_insert_with(Vec::new).push(y);
+                }
+            });
+
+        let pages = self
+            .lines
+            .iter()
+            .filter(|l| !l.contains("|"))
+            .map(|l| l.split(",").map(|s| s.to_string()).collect::<Vec<String>>())
+            .collect::<Vec<Vec<String>>>();
 
         let result = pages
-        .into_iter()
-        .filter(|line| {
-            let mut result = true;
-            for (i, n) in line.into_iter().enumerate() {
-                if !(i < line.len() -1) {
-                    break
+            .into_iter()
+            .filter(|line| {
+                let mut result = true;
+                for (i, n) in line.into_iter().enumerate() {
+                    if !(i < line.len() - 1) {
+                        break;
+                    }
+                    let matches = rules
+                        .entry(n.parse::<i32>().unwrap())
+                        .or_insert_with(Vec::new);
+                    let next = line[i + 1].parse::<i32>().unwrap();
+                    if !matches.contains(&next) {
+                        result = false;
+                        break;
+                    }
                 }
-                let matches = rules.entry(n.parse::<i32>().unwrap()).or_insert_with(Vec::new);
-                let next = line[i+1].parse::<i32>().unwrap();
-                if !matches.contains(&next) {
-                    result = false;
-                    break;
-                }
-            }
 
-            return result;
-        })
-        .map(|line| {
-            return line[line.len()/2].parse::<i32>().unwrap()
-        })
-        .sum::<i32>();
+                return result;
+            })
+            .map(|line| return line[line.len() / 2].parse::<i32>().unwrap())
+            .sum::<i32>();
 
         result.to_string()
     }
 
     fn second_part(&mut self) -> String {
         let mut rules: HashMap<i32, HashSet<i32>> = HashMap::new();
-  
-        self.lines
-        .iter()
-        .filter(|l| l.contains("|"))
-        .for_each(|line| {
-            if let Some((x, y)) = line.split_once('|') {
-                let x: i32 = x.parse().unwrap();
-                let y: i32 = y.parse().unwrap();
-                rules.entry(x).or_insert_with(HashSet::new).insert(y);            
-            }
-        });
 
-        let pages = self.lines
-        .iter()
-        .filter(|l| !l.contains("|"))
-        .map(|l| l.split(",").map(|s| s.to_string()).collect::<Vec<String>>())
-        .collect::<Vec<Vec<String>>>();
+        self.lines
+            .iter()
+            .filter(|l| l.contains("|"))
+            .for_each(|line| {
+                if let Some((x, y)) = line.split_once('|') {
+                    let x: i32 = x.parse().unwrap();
+                    let y: i32 = y.parse().unwrap();
+                    rules.entry(x).or_insert_with(HashSet::new).insert(y);
+                }
+            });
+
+        let pages = self
+            .lines
+            .iter()
+            .filter(|l| !l.contains("|"))
+            .map(|l| l.split(",").map(|s| s.to_string()).collect::<Vec<String>>())
+            .collect::<Vec<Vec<String>>>();
 
         let result = pages
-        .into_iter()
-        .filter(|line| {
-            let mut result = false;
-            for (i, n) in line.into_iter().enumerate() {
-                if !(i < line.len() -1) {
-                    break
+            .into_iter()
+            .filter(|line| {
+                let mut result = false;
+                for (i, n) in line.into_iter().enumerate() {
+                    if !(i < line.len() - 1) {
+                        break;
+                    }
+                    let matches = rules
+                        .entry(n.parse::<i32>().unwrap())
+                        .or_insert_with(HashSet::new);
+                    let next = line[i + 1].parse::<i32>().unwrap();
+                    if !matches.contains(&next) {
+                        result = true;
+                        break;
+                    }
                 }
-                let matches = rules.entry(n.parse::<i32>().unwrap()).or_insert_with(HashSet::new);
-                let next = line[i+1].parse::<i32>().unwrap();
-                if !matches.contains(&next) {
-                    result = true;
-                    break;
-                }
-            }
-            
-            return result;
-        })
-        .collect::<Vec<Vec<String>>>();
 
+                return result;
+            })
+            .collect::<Vec<Vec<String>>>();
 
         result
-        .iter()
-        .map(|r| {
-            let mut sorted = r.clone();
-            sort_update(&mut sorted, &rules);
-            sorted[sorted.len()/2].parse::<i32>().unwrap()
-        }).sum::<i32>().to_string()
-
+            .iter()
+            .map(|r| {
+                let mut sorted = r.clone();
+                sort_update(&mut sorted, &rules);
+                sorted[sorted.len() / 2].parse::<i32>().unwrap()
+            })
+            .sum::<i32>()
+            .to_string()
     }
 }

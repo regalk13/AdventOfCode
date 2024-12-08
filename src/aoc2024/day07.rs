@@ -31,8 +31,7 @@ impl AocDay07 {
             return true;
         }
 
-        if target > values[n - 1]
-            && self.obtain(target - values[n - 1], &values[..n - 1], second_p)
+        if target > values[n - 1] && self.obtain(target - values[n - 1], &values[..n - 1], second_p)
         {
             return true;
         }
@@ -40,10 +39,8 @@ impl AocDay07 {
         if second_p {
             let s_target = target.to_string();
             let s_last = values[n - 1].to_string();
-    
-            if s_target.len() > s_last.len()
-                && s_target.ends_with(&s_last)
-            {
+
+            if s_target.len() > s_last.len() && s_target.ends_with(&s_last) {
                 let truncated = &s_target[..s_target.len() - s_last.len()];
                 if let Ok(truncated_value) = truncated.parse::<i64>() {
                     if self.obtain(truncated_value, &values[..n - 1], second_p) {
@@ -94,6 +91,6 @@ impl Runit for AocDay07 {
             .filter(|calibration| self.obtain(calibration.target, &calibration.values, true))
             .map(|calibration| calibration.target)
             .sum::<i64>()
-            .to_string() 
+            .to_string()
     }
 }

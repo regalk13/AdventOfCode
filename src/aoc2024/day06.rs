@@ -77,7 +77,7 @@ impl AocDay06 {
         }
         (0, 0)
     }
-    
+
     fn in_bounds(&self, position: (i32, i32)) -> bool {
         position.0 >= 0
             && position.1 >= 0
@@ -85,7 +85,11 @@ impl AocDay06 {
             && position.1 < self.lines[0].len() as i32
     }
 
-    fn trace_path(&self, mut guard_location: (i32, i32), mut direction: Direction) -> Vec<(i32, i32)> {
+    fn trace_path(
+        &self,
+        mut guard_location: (i32, i32),
+        mut direction: Direction,
+    ) -> Vec<(i32, i32)> {
         let mut positions = std::collections::HashSet::new();
 
         loop {
