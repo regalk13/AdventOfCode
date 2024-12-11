@@ -100,7 +100,6 @@ impl Runit for AocDay10 {
             .into_iter()
             .map(|(r, c)| self.solve_pt1(r as i32, c as i32, true))
             .sum::<usize>();
-
         result.to_string()
     }
 }
